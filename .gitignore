@@ -1,3 +1,5 @@
 raw_data/
 raw_data_slim/
 .DS_Store
+raw_data_slim/
+notebooks/
