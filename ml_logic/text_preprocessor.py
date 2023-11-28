@@ -12,7 +12,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 
 class TextPreprocessor:
-    def __init__(self, dataset_path="raw_data_slim/merged_slim_file.csv"):
+    def __init__(self, dataset_path):
         self.dataset_path = dataset_path
         self.google_reviews_df = self.dataset_initial_import()
 
@@ -76,7 +76,8 @@ class TextPreprocessor:
         self.google_reviews_df.drop(columns=['text', 'textTranslated', 'review_english'], inplace=True)
 
 if __name__ == "__main__":
-    text_preprocessor = TextPreprocessor()
+    dataset_path = "raw_data_slim/merged_slim_file.csv"
+    text_preprocessor = TextPreprocessor(dataset_path)
     text_preprocessor.preprocess_dataset()
     print("Done")
     print(text_preprocessor.google_reviews_df.head(3))
