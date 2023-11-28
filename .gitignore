@@ -1,5 +1,6 @@
 raw_data/
 raw_data_slim/
+.DS_Store
 notebooks/
 .DS_Store
 ml_logic/__pycache__/
