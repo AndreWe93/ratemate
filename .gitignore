@@ -1,5 +1,13 @@
 raw_data/
 raw_data_slim/
-notebooks/
 .DS_Store
+
+# Jupiter Notebook #
+notebooks/
 ml_logic/__pycache__/
+ml_logic/__pycache__
+.pytest_cache
+*.ipynb
+
+*.csv
+*.zip
