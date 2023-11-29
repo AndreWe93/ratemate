@@ -1,4 +1,7 @@
 import pandas as pd
+# !pip install torch
+# !pip install transformers
+
 from transformers import pipeline, BertTokenizer, BertModel
 import torch
 import numpy as np
