@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import  TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 
-from ml_logic.text_preprocessor import TextPreprocessor
+from RateMate.ml_logic.text_preprocessor import TextPreprocessor
 
 
 import nltk
@@ -92,7 +92,7 @@ class LDA_Analysis:
 
 if __name__ == "__main__":
 
-    path = "../RateMate/raw_data/merged_slim_file.csv"
+    path = "./RateMate/raw_data/merged_slim_file.csv"
 
     text_preprocessor = TextPreprocessor(path)
     text_preprocessor.preprocess_dataset()
