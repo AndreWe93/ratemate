@@ -74,6 +74,7 @@ class TextPreprocessor:
         self.google_reviews_df["reviews_without_SW"] = self.google_reviews_df['review_english'].apply(
             self.preprocessing_without_stopwords)
         self.google_reviews_df.drop(columns=['text', 'textTranslated', 'review_english'], inplace=True)
+        self.google_reviews_df.publishedAtDate = pd.to_datetime(self.google_reviews_df.publishedAtDate)
 
 if __name__ == "__main__":
     dataset_path = "raw_data_slim/merged_slim_file.csv"
