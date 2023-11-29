@@ -42,8 +42,8 @@ class TextPreprocessor:
 
         cleaned_sentence = ' '.join(word for word in lemmatized)
 
-        if cleaned_sentence == 'nan':
-            cleaned_sentence = np.nan
+        # if cleaned_sentence == 'nan':
+        #     cleaned_sentence = np.nan
 
         return cleaned_sentence
 
@@ -63,8 +63,8 @@ class TextPreprocessor:
         lemmatized = [WordNetLemmatizer().lemmatize(word, pos="v") for word in tokenized_sentence_cleaned]
 
         cleaned_sentence = ' '.join(word for word in lemmatized)
-        if cleaned_sentence == 'nan':
-            cleaned_sentence = np.nan
+        # if cleaned_sentence == 'nan':
+        #     cleaned_sentence = np.nan
 
         return cleaned_sentence
 
@@ -77,8 +77,9 @@ class TextPreprocessor:
         self.google_reviews_df.publishedAtDate = pd.to_datetime(self.google_reviews_df.publishedAtDate)
 
 if __name__ == "__main__":
-    dataset_path = "raw_data_slim/merged_slim_file.csv"
-    text_preprocessor = TextPreprocessor(dataset_path)
-    text_preprocessor.preprocess_dataset()
-    print("Done")
-    print(text_preprocessor.google_reviews_df.head(3))
+    # dataset_path = "raw_data_slim/merged_slim_file.csv"
+    # text_preprocessor = TextPreprocessor(dataset_path)
+    # text_preprocessor.preprocess_dataset()
+    # print("Done")
+    # print(text_preprocessor.google_reviews_df.head(3))
+    pass

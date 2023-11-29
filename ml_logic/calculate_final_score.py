@@ -77,4 +77,5 @@ def df_with_score(df, price_weight, service_weight, atmosphere_weight, food_weig
         return df
 
 def overall_score(df):
-    return round(df.average_score.mean(),2)
+    return round(df.average_score.mean(), 2)
+
