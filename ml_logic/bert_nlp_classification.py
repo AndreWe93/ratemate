@@ -48,12 +48,12 @@ def calculate_scores(review_text, tokenizer, model, topic_related_words):
 
     return rounded_scores
 
-def process_reviews(df):
+def process_reviews(df, column_name): #column_name of review text to be analyzed
     tokenizer, model = load_bert_model()
     topic_related_words = define_topic_related_words()
 
     # Apply the scoring function to each review in the DataFrame
-    df['topic_scores'] = df["textTranslated"].apply(lambda text: calculate_scores(text, tokenizer, model, topic_related_words))
+    df['topic_scores'] = df[f'{column_name}'].apply(lambda text: calculate_scores(text, tokenizer, model, topic_related_words))
 
     # Expand the scores into separate columns
     df = pd.concat([df.drop(['topic_scores'], axis=1), df['topic_scores'].apply(pd.Series)], axis=1)
@@ -68,5 +68,5 @@ if __name__ == "__main__":
     data = data.dropna(subset=['textTranslated'])
     print("Data loaded ✅")
     df = data.head(50)
-    result_df = process_reviews(df)
-    print(result_df.head())
+    result_df = process_reviews(df, "textTranslated")
+    print(result_df.head(10))
