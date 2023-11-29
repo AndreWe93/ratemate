@@ -8,7 +8,7 @@ def fill_sub_ratings(df, only_price = False):
         return df
     else:
         df["price_rating"] = np.random.randint(1, 6, size=len(df))
-        df["service_ratin"] = np.random.randint(1, 6, size=len(df))
+        df["service_rating"] = np.random.randint(1, 6, size=len(df))
         df["atmosphere_rating"] = np.random.randint(1, 6, size=len(df))
         df["food_rating"] = np.random.randint(1, 6, size=len(df))
         return df
