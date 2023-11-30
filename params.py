@@ -24,22 +24,20 @@ GAR_MEMORY = os.environ.get("GAR_MEMORY")
 LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "data")
 LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
 
-# COLUMN_NAMES_RAW = [
-#         "placeId",
-#         "title",
-#         "reviewId",
-#         "reviewerId",
-#         "isLocalGuide",
-#         "reviewDetailedRating/Atmosphere",
-#         "reviewDetailedRating/Food",
-#         "reviewDetailedRating/Service",
-#         "reviewerNumberOfReviews",
-#         "text",
-#         "textTranslated",
-#         "stars"
-#     ]
-
-COLUMN_NAMES_RAW = ['title', 'reviewId', 'reviewDetailedRating/Food', 'reviewDetailedRating/Service', 'reviewDetailedRating/Atmosphere', 'text', 'textTranslated', 'stars']
+COLUMN_NAMES_RAW = [
+        "placeId",
+        "title",
+        "reviewId",
+        "reviewerId",
+        "isLocalGuide",
+        "reviewDetailedRating/Atmosphere",
+        "reviewDetailedRating/Food",
+        "reviewDetailedRating/Service",
+        "reviewerNumberOfReviews",
+        "text",
+        "textTranslated",
+        "stars"
+    ]
 
 DTYPES_RAW = {}
 

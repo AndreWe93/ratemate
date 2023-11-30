@@ -97,8 +97,8 @@ class TextPreprocessor:
         # Dropping original reviews columns
         self.google_reviews_df.drop(columns=['text', 'textTranslated', 'review_english'], inplace=True)
 
-        # # Converting publishedAtDate column format to datetime
-        # self.google_reviews_df.publishedAtDate = pd.to_datetime(self.google_reviews_df.publishedAtDate)
+        # Converting publishedAtDate column format to datetime
+        self.google_reviews_df.publishedAtDate = pd.to_datetime(self.google_reviews_df.publishedAtDate)
 
 if __name__ == "__main__":
     your_dataset = pd.read_csv("raw_data_slim/merged_slim_file.csv")
