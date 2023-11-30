@@ -1,4 +1,4 @@
-from RateMate.ml_logic.NLP import pretraining_NLP_models, get_dataset_for_NLP, get_Xy_for_NLP
+from ml_logic.NLP import pretraining_NLP_models, get_dataset_for_NLP, get_Xy_for_NLP
 import pandas as pd
 
 

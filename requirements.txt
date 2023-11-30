@@ -26,3 +26,5 @@ uvicorn
 # pyarrow
 # prefect==2.8.1
 # psycopg2-binary
+
+tensorflow

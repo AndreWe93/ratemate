@@ -9,7 +9,7 @@ from tensorflow.keras import layers, Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import models
-from RateMate.ml_logic.text_preprocessor import TextPreprocessor
+from ml_logic.text_preprocessor import TextPreprocessor
 
 import pickle
 
@@ -25,8 +25,7 @@ from mlflow.keras import save_model
 constants
 """
 
-path = "Ratemate/raw_data/merged_slim_file.csv"
-dataset = pd.read_csv(path)
+
 
 
 columns = [#"reviewContext/Price per person",
@@ -66,7 +65,7 @@ embedding_size = 150
 
 
 
-def get_dataset_for_NLP(dataset=dataset):
+def get_dataset_for_NLP(dataset):
 
     """
     returns preprocessed: DF for training NLP and original DF
@@ -83,7 +82,7 @@ def get_dataset_for_NLP(dataset=dataset):
 
     return data, df_full
 
-def get_dataset_only_for_NLP(dataset=dataset):
+def get_dataset_only_for_NLP(dataset):
     """
     returns preprocessed: DF only for training NLP
     """
@@ -316,4 +315,5 @@ def new_column_NLP(df_preprocessed):
 
 
 if __name__ == "__main__":
-    pass
+    path = "Ratemate/raw_data/merged_slim_file.csv"
+    dataset = pd.read_csv(path)
