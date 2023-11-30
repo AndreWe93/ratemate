@@ -15,10 +15,13 @@ from RateMate.ml_logic.text_preprocessor import TextPreprocessor
 
 
 import seaborn as sns
-import datetime
-import tensorflow as tf
+
+"""
+constants
+"""
 
 path = "Ratemate/raw_data/merged_slim_file.csv"
+dataset = pd.read_csv(path)
 
 
 columns = [#"reviewContext/Price per person",
@@ -35,36 +38,51 @@ y_columns = [#"reviewContext/Price per person",
         "reviewDetailedRating/Food",
         "reviewDetailedRating/Service"
         ]
-X_column = [ #'reviews_without_SW',
-        'reviews_with_SW'
+X_column = [ 'reviews_without_SW',
+        #'reviews_with_SW'
         ]
 
-maxlen = 100
+maxlen = 150
 
-es = EarlyStopping(patience=15)
+es = EarlyStopping(patience=5)
 validation_split=0.3
 epochs=50
-batch_size=32
+batch_size=16
+embedding_size = 150
 
-def get_dataset_for_NLP(path):
 
-    text_preprocessor = TextPreprocessor(path)
+
+def get_dataset_for_NLP(dataset=dataset):
+    """
+    returns preprocessed: DF for training NLP and original DF
+    """
+    text_preprocessor = TextPreprocessor(dataset)
     text_preprocessor.preprocess_dataset()
 
-    df = text_preprocessor.google_reviews_df
+    df_full = text_preprocessor.google_reviews_df
 
 
-    data = df[columns]
+    data = df_full[columns]
     data.dropna(inplace=True)
-    return data, df
+
+    return data, df_full
+
+
 
 def get_Xy_for_NLP(data):
-
+    """
+    return X,y for df
+    """
     y = data[y_columns].values
     X = data[X_column].values
     return X, y
 
+
+
 def tokenizer_for_NLP(X):
+    """
+    returned tokenizer traind by X
+    """
     X_words = [text_to_word_sequence(str(sentence)) for sentence in X]
 
     tk = Tokenizer()
@@ -72,8 +90,11 @@ def tokenizer_for_NLP(X):
     return tk
 
 
-def build_model_nlp(X, maxlen = maxlen, embedding_size = 100):
 
+def build_model_nlp(X, maxlen = maxlen, embedding_size = embedding_size): #used within 'pretrained_NLP_models'
+    """
+    buolding main model for NLP
+    """
     # Vocab size
     tk = tokenizer_for_NLP(X)
 
@@ -117,10 +138,10 @@ def build_model_nlp(X, maxlen = maxlen, embedding_size = 100):
 
 
 
+def fit_NLP(model, X_pad, y, maxlen = maxlen, n=0): #used within 'pretrained_NLP_models'
 
-def fit_NLP(model, X_pad, y, maxlen = maxlen, n=0):
-
-
+    """
+    """
 
     history = model.fit(X_pad, y[:,n],
             validation_split=validation_split,
@@ -131,11 +152,14 @@ def fit_NLP(model, X_pad, y, maxlen = maxlen, n=0):
     return history
 
 
+
 def evaluate_NLP(model, tk,
                  df_test_csv_path = 'RateMate/raw_data/Pepenero Schwabing.csv',
                  maxlen = maxlen,
                  n = 0):
 
+    """
+    """
     df_test = get_dataset_for_NLP(df_test_csv_path)
     X_test, y_test = get_Xy_for_NLP(df_test)
 
@@ -153,7 +177,10 @@ def evaluate_NLP(model, tk,
 
 
 
-def info_NLP(tk,X):
+def info_NLP(tk,X,y):
+    """
+    just info about X, y
+    """
     X_tokens = tk.texts_to_sequences(X.tolist())
 
     sns.histplot([len(x) for x in X_tokens]);
@@ -162,7 +189,10 @@ def info_NLP(tk,X):
 
 
 
-def predict_NLP(model, X, tk):
+def predict_NLP(model, X, tk): #used within 'new_column_NLP'
+    """
+    tokenizing and padding X and making predictions
+    """
     X_words_test = [text_to_word_sequence(str(sentence)) for sentence in X]
     X_tokens_test = tk.texts_to_sequences(X_words_test)
 
@@ -172,41 +202,45 @@ def predict_NLP(model, X, tk):
     return y_pred
 
 
-def new_column_NLP():#dataset,y_pred,
-    #                name = 'Atmosphere'):
-    # #dataset[name] = dataset[X_column].apply(x: predict_NLP(model, x, tk))
-    # dataset[name] = y_pred
 
-    data, df_full = get_dataset_for_NLP(path)
-    X, y = get_Xy_for_NLP(data)
-    X_full, y_full = get_Xy_for_NLP(df_full)
-    tk = tokenizer_for_NLP(X)
-
-
+def pretrained_NLP_models(X,y):
+    """
+    saving models for loading in 'new_column_NLP'
+    """
     for n, column in enumerate(y_columns):
-
         model, X_pad = build_model_nlp(X)
         history = fit_NLP(model, X_pad, y, n=n)
+        models.save_model(model, f'my_model_{n}')
 
 
-        y_pred = predict_NLP(model, X_full, tk)
 
+def new_column_NLP(df_preprocessed, tk):
+    """
+    adding new columns to df
+    """
 
-        df_full[column[21:]] = y_pred
+    ####################################
+    #
+    ####################################
 
-    return df_full
-
-
-def pretrained_NLP_models():
+    # text_preprocessor = TextPreprocessor(path)
+    # text_preprocessor.preprocess_dataset()
+    # df = text_preprocessor.google_reviews_df
+    X, y = get_Xy_for_NLP(df_preprocessed)
+    ####################################
+    #
+    ####################################
     for n, column in enumerate(y_columns):
-        model, X_pad = build_model_nlp(X)
 
+        pretrained_model = models.load_model(f'my_model_{n}')
+        y_pred = predict_NLP(pretrained_model, X, tk)
+        df_preprocessed[column[21:]] = y_pred
 
+    return df_preprocessed
 
 
 
 
 
 if __name__ == "__main__":
-
-    new_column_NLP()
+    pass
