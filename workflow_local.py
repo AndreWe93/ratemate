@@ -3,7 +3,7 @@ import pandas as pd
 from ml_logic.text_preprocessor import TextPreprocessor
 from ml_logic.bert_nlp_classification import process_reviews
 from ml_logic.calculate_final_score import *
-from ml_logic.NLP import *
+from ml_logic.NLP import new_column_NLP
 
 
 

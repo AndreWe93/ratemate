@@ -9,7 +9,7 @@ from tensorflow.keras import layers, Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import models
-from RateMate.ml_logic.text_preprocessor import TextPreprocessor
+from ml_logic.text_preprocessor import TextPreprocessor
 
 import pickle
 
@@ -26,7 +26,7 @@ constants
 """
 
 path = "Ratemate/raw_data/merged_slim_file.csv"
-dataset = pd.read_csv(path)
+#dataset = pd.read_csv(path)
 
 
 columns = [#"reviewContext/Price per person",
