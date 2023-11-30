@@ -16,7 +16,7 @@ def scrape_apify(url, maxReviews = 20, reviewsSort = "newest", language = "en", 
         "language": language,
         "personalData": personalData,
     }
-    columns = ['title', 'reviewId', 'rating_Food', 'rating_Service', 'rating_Atmosphere', 'review', 'review_translated', 'stars']
+    columns = ['title', 'reviewId', 'reviewDetailedRating/Food', 'reviewDetailedRating/Service', 'reviewDetailedRating/Atmosphere', 'text', 'textTranslated', 'stars']
 
     # Run the Actor and wait for it to finish
     run = client.actor("Xb8osYTtOjlsgI6k9").call(run_input=run_input)
