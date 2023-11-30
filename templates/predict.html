@@ -1,0 +1,60 @@
+<!-- predict.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict with Sliders</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+
+<form action="/predict_result" method="get">
+    <label for="price-slider">Price Review Weightage:</label>
+    <input type="range" id="price-slider" name="price_review_weightage" min="0" max="1" step="0.01" value="0.5">
+    <span id="price-value">0.5</span>
+    <br>
+
+    <label for="food-slider">Food Review Weightage:</label>
+    <input type="range" id="food-slider" name="food_review_weightage" min="0" max="1" step="0.01" value="0.5">
+    <span id="food-value">0.5</span>
+    <br>
+
+    <label for="service-slider">Service Review Weightage:</label>
+    <input type="range" id="service-slider" name="service_review_weightage" min="0" max="1" step="0.01" value="0.5">
+    <span id="service-value">0.5</span>
+    <br>
+
+    <label for="ambience-slider">Ambience Review Weightage:</label>
+    <input type="range" id="ambience-slider" name="ambience_review_weightage" min="0" max="1" step="0.01" value="0.5">
+    <span id="ambience-value">0.5</span>
+    <br>
+
+    <label for="other-parameter">Some Other Parameter:</label>
+    <input type="number" id="other-parameter" name="some_other_parameter" min="1" max="10" step="1" value="1">
+    <br>
+
+    <button type="submit">Submit Prediction</button>
+</form>
+
+<script>
+    // Update slider value display
+    document.getElementById("price-slider").addEventListener("input", function () {
+        document.getElementById("price-value").innerText = this.value;
+    });
+
+    document.getElementById("food-slider").addEventListener("input", function () {
+        document.getElementById("food-value").innerText = this.value;
+    });
+
+    document.getElementById("service-slider").addEventListener("input", function () {
+        document.getElementById("service-value").innerText = this.value;
+    });
+
+    document.getElementById("ambience-slider").addEventListener("input", function () {
+        document.getElementById("ambience-value").innerText = this.value;
+    });
+</script>
+
+</body>
+</html>
