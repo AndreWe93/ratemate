@@ -29,7 +29,7 @@ def scrape_apify(url, maxReviews = 20, reviewsSort = "newest", language = "en", 
         df.loc[i, "review"] = item["text"]
         df.loc[i, "review_translated"] = item["textTranslated"]
         df.loc[i, "stars"] = item["stars"]
-        if "reviewDetailedRating" in item and "Food" in item["reviewDetailedRating"]:
+        if "reviewDetailedRating" in item and "Food" in item["reviewDetailedRating"]: #Detailed Rataings are in a sub-dict. some of them are empty
             df.loc[i, "rating_Food"] = item["reviewDetailedRating"]["Food"]
         else:
             df.loc[i, "rating_Food"] = np.nan
