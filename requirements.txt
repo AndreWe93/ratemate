@@ -1,6 +1,28 @@
-pandas
-numpy
+torch
 seaborn
+pathlib
+colorama
+matplotlib
+transformers
+apify_client
+
+# google-cloud-storage
+# google-cloud-bigquery
+
+numpy
+pandas
+mlflow
+scikit-learn
+
+python-dotenv
+
 fastapi
 uvicorn
-apify_client
+
+# pytz
+# httpx
+# pytest-asyncio
+# db-dtypes
+# pyarrow
+# prefect==2.8.1
+# psycopg2-binary
