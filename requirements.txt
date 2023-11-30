@@ -1,0 +1,6 @@
+pandas
+numpy
+seaborn
+fastapi
+uvicorn
+apify_client
