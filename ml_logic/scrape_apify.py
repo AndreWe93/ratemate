@@ -24,23 +24,27 @@ def scrape_apify(url, maxReviews = 20, reviewsSort = "newest", language = "en", 
     df = pd.DataFrame(columns=columns)
 
     for i, item in enumerate(client.dataset(run["defaultDatasetId"]).iterate_items()):
+        df.loc[i, "placeId"] = item["placeId"]
         df.loc[i, "title"] = item["title"]
         df.loc[i, "reviewId"] = item["reviewId"]
-        df.loc[i, "review"] = item["text"]
-        df.loc[i, "review_translated"] = item["textTranslated"]
-        df.loc[i, "stars"] = item["stars"]
-        if "reviewDetailedRating" in item and "Food" in item["reviewDetailedRating"]: #Detailed Rataings are in a sub-dict. some of them are empty
-            df.loc[i, "rating_Food"] = item["reviewDetailedRating"]["Food"]
+        df.loc[i, "reviewerId"] = item["reviewerId"]
+        df.loc[i, "isLocalGuide"] = item["isLocalGuide"]
+        if "reviewDetailedRating" in item and "Food" in item["reviewDetailedRating"]:
+            df.loc[i, "reviewDetailedRating/Food"] = item["reviewDetailedRating"]["Food"]
         else:
-            df.loc[i, "rating_Food"] = np.nan
+            df.loc[i, "reviewDetailedRating/Food"] = np.nan
         if "reviewDetailedRating" in item and "Service" in item["reviewDetailedRating"]:
-            df.loc[i, "rating_Service"] = item["reviewDetailedRating"]["Service"]
+            df.loc[i, "reviewDetailedRating/Service"] = item["reviewDetailedRating"]["Service"]
         else:
-            df.loc[i, "rating_Service"] = np.nan
+            df.loc[i, "reviewDetailedRating/Service"] = np.nan
         if "reviewDetailedRating" in item and "Atmosphere" in item["reviewDetailedRating"]:
-            df.loc[i, "rating_Atmosphere"] = item["reviewDetailedRating"]["Atmosphere"]
+            df.loc[i, "reviewDetailedRating/Atmosphere"] = item["reviewDetailedRating"]["Atmosphere"]
         else:
-            df.loc[i, "rating_Atmosphere"] = np.nan
+            df.loc[i, "reviewDetailedRating/Atmosphere"] = np.nan
+        df.loc[i, "reviewerNumberOfReviews"] = item["reviewerNumberOfReviews"]
+        df.loc[i, "text"] = item["text"]
+        df.loc[i, "textTranslated"] = item["textTranslated"]
+        df.loc[i, "stars"] = item["stars"]
 
     return df
 
@@ -49,3 +53,4 @@ if __name__ == "__main__":
     df = scrape_apify(url)
     print(df.head())
     print(df.stars.mean())
+    print(df.columns)
