@@ -11,3 +11,8 @@ ml_logic/__pycache__
 
 *.csv
 *.zip
+
+
+my_model_*
+my_model_0/
+my_model_1/
