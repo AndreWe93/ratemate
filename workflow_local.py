@@ -44,11 +44,8 @@ sub_ratings_df = fill_sub_ratings(result_df_small, only_price=True)
 try:
     sub_ratings_df = new_column_NLP(sub_ratings_df)
 except:
+
     print("********DO 'save_models.py' first******")
-
-print(sub_ratings_df.head(3))
-
-
 
 final_score_df = df_with_score(sub_ratings_df, price_weight=0.25, service_weight=0.25, atmosphere_weight=0.25, food_weight=0.25)
 print(f"Dataset with final scores {final_score_df.head(3)}")
