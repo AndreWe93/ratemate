@@ -21,8 +21,8 @@ GAR_IMAGE = os.environ.get("GAR_IMAGE")
 GAR_MEMORY = os.environ.get("GAR_MEMORY")
 
 ##################  CONSTANTS  #####################
-LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "data")
-LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
+LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), ".ratemate", "mlops", "data")
+LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".ratemate", "mlops", "training_outputs")
 
 # COLUMN_NAMES_RAW = [
 #         "placeId",
