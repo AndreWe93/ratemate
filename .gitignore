@@ -8,7 +8,8 @@ ml_logic/__pycache__/
 ml_logic/__pycache__
 .pytest_cache
 *.ipynb
-
+*/__pycache__/
+__pycache__/
 *.csv
 *.zip
 
