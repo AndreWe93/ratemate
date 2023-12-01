@@ -24,7 +24,7 @@ def calculate_price_subrating(row):
     return price_subrating
 
 def df_with_price_rating(df):
-    df["price_rating"] = df.apply(calculate_price_subrating)
+    df["price_rating"] = df.apply(calculate_price_subrating, axis = 1)
 
     return df
 
