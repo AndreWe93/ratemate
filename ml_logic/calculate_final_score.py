@@ -92,3 +92,11 @@ def df_with_score(df, price_weight, service_weight, atmosphere_weight, food_weig
 
 def overall_score(df):
     return round(df.average_score.mean(), 2)
+
+def individual_scores(df):
+    average_price = round(df.price_rating.mean(),2)
+    average_service = round(df.service_rating.mean(),2)
+    average_food = round(df.food_rating.mean(),2)
+    average_atmosphere = round(df.atmosphere_rating.mean(),2)
+
+    return average_price, average_service, average_atmosphere,average_food
