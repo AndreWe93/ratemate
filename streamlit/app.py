@@ -7,6 +7,14 @@ from ml_logic.calculate_final_score import *
 from interface.main import *
 from params import *
 
+####### TO Dos #########
+"""
+1. Show the original score
+2. Show the subratings from the dataset
+3. Integrate the Word cloud picture from my notebook somehow into the streamlit app
+4. Add more features
+"""
+
 st.markdown("""# RateMate
 ## Get your personal rating for the restaurant of your choice
 Hello friend, please insert the google maps url of the restaurant you are interested in:""")
