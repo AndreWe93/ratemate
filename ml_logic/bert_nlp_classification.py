@@ -15,7 +15,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import pandas as pd
 from transformers import BertTokenizer, BertModel
-import torch
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
