@@ -5,7 +5,7 @@ colorama
 matplotlib
 transformers
 apify_client
-
+nltk
 # google-cloud-storage
 # google-cloud-bigquery
 

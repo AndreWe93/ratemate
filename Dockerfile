@@ -1,6 +1,6 @@
 FROM python:3.10.6-buster
 
-WORKDIR /ratemate_app_test
+WORKDIR /ratemate_01
 COPY requirements.txt requirements.txt
 
 RUN pip install --upgrade pip
@@ -8,8 +8,10 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY api api
+COPY interface interface
 COPY ml_logic ml_logic
 COPY setup.py setup.py
+COPY params.py params.py 
 
 RUN pip install .
 
