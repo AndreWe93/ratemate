@@ -3,7 +3,7 @@ import pandas as pd
 # !pip install transformers
 
 from transformers import pipeline, BertTokenizer, BertModel
-import torch
+import tensorflow as tf
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -37,14 +37,14 @@ def define_topic_related_words():
 def calculate_scores(review_text, tokenizer, model, topic_related_words):
     tokens = tokenizer(review_text, return_tensors='pt', truncation=True, padding=True)
 
-    with torch.no_grad():
-        outputs = model(**tokens)
-        embeddings = outputs['last_hidden_state'].squeeze()
+    with tf.device('/CPU:0'):  # You can adjust the device as needed
+        outputs = model(tokens['input_ids'])
+        embeddings = outputs.last_hidden_state[:, 0, :].detach().numpy()
 
     similarity_scores = {}
     for topic, keywords in topic_related_words.items():
         topic_embeddings = [model.embeddings.word_embeddings.weight[tokenizer.convert_tokens_to_ids(keyword)].detach().numpy() for keyword in keywords]
-        similarity_scores[topic] = cosine_similarity(embeddings.detach().numpy(), topic_embeddings).mean(axis=1).sum()
+        similarity_scores[topic] = cosine_similarity(embeddings, topic_embeddings).mean(axis=1).sum()
 
     softmax_scores = {topic: np.exp(score) / np.sum(np.exp(list(similarity_scores.values()))) for topic, score in similarity_scores.items()}
     rounded_scores = {topic: round(score, 2) for topic, score in softmax_scores.items()}
