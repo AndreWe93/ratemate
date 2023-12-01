@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 
 from ml_logic.scrape_apify import scrape_apify
+from ml_logic.NLP import new_column_NLP
+from ml_logic.calculate_final_score import *
 from interface.main import *
 from params import *
 
@@ -50,11 +52,13 @@ if st.button("Get Score"):
 
     # model = app.state.model
     # assert model is not None
+    subratings_df = new_column_NLP(classified_df)
 
-    subratings_df = create_sub_ratings(classified_df) # This is a place holder
+    #subratings_df = create_sub_ratings(classified_df) # This is a place holder
+    subratings_df_price = df_with_price_rating(subratings_df)
 
     # Average scores
-    average_scores_df = calculate_average_scores(subratings_df, price, service, ambience, food)
+    average_scores_df = calculate_average_scores(subratings_df_price, price, service, ambience, food)
 
     # Overall score
     overall_score = calculate_overall_score(average_scores_df)
@@ -69,3 +73,41 @@ if st.button("Get Score"):
     #     st.success(f'The score of your restaurant is: {score}')
     # else:
     #     st.error('Failed to get score from the API. Please try again.')
+
+# ############## copy from streamlit/frontend.py
+# # pip install streamlit
+# import streamlit as st
+# import requests
+
+
+# '''
+# # Let's test our API with some scraping and scoring
+# '''
+
+# st.markdown('''
+# Hello friend, please insert the google maps url of the restaurant you are interested in:
+# ''')
+
+
+# url_user = st.text_input("url of your restaurant")
+
+
+
+# if st.button("Get Score"):
+#     url = 'https://awtestratemate2-z2kqlvo2ta-ew.a.run.app/scrape'
+
+#     params = {
+#             'url': url_user
+#             }
+
+#     # Make API request
+#     response = requests.get(url, params=params)
+
+#     if response.status_code == 200:
+#         # Retrieve prediction from JSON response
+#         score = response.json()["average score of ratings"]
+
+#         # Display prediction to the user
+#         st.success(f'The score of your restaurant is: {score}')
+#     else:
+#         st.error('Failed to get score from the API. Please try again.')
