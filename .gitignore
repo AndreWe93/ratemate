@@ -10,6 +10,7 @@ ml_logic/__pycache__
 *.ipynb
 */__pycache__/
 __pycache__/
+api/__pycache__/
 *.csv
 *.zip
 
