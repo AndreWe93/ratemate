@@ -14,13 +14,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 '''
 
 import pandas as pd
-from transformers import BertTokenizer, BertModel
+from transformers import BertTokenizer, TFBertModel
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 def load_bert_model(model_name='bert-base-uncased'):
     tokenizer = BertTokenizer.from_pretrained(model_name)
-    model = BertModel.from_pretrained(model_name)
+    model = TFBertModel.from_pretrained(model_name)
     return tokenizer, model
 
 def define_topic_related_words():
