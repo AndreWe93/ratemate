@@ -3,7 +3,7 @@ import pandas as pd
 # !pip install transformers
 
 from transformers import pipeline, BertTokenizer, BertModel
-import tensorflow as tf
+import torch
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -20,7 +20,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def load_bert_model(model_name='bert-base-uncased'):
     tokenizer = BertTokenizer.from_pretrained(model_name)
-    model = TFBertModel.from_pretrained(model_name)
+    model = BertModel.from_pretrained(model_name)
     return tokenizer, model
 
 def define_topic_related_words():
@@ -34,16 +34,16 @@ def define_topic_related_words():
 
 # Function to calculate normalized scores for a given review
 def calculate_scores(review_text, tokenizer, model, topic_related_words):
-    tokens = tokenizer(review_text, return_tensors='tf', truncation=True, padding=True)
+    tokens = tokenizer(review_text, return_tensors='pt', truncation=True, padding=True)
 
-    with tf.device('/CPU:0'):  # You can adjust the device as needed
-        outputs = model(tokens['input_ids'])
-        embeddings = outputs.last_hidden_state[:, 0, :].numpy()
+    with torch.no_grad():
+        outputs = model(**tokens)
+        embeddings = outputs['last_hidden_state'].squeeze()
 
     similarity_scores = {}
     for topic, keywords in topic_related_words.items():
-        topic_embeddings = [model.get_layer('bert').embeddings(tokenizer.convert_tokens_to_ids(keyword)).numpy() for keyword in keywords]
-        similarity_scores[topic] = cosine_similarity(embeddings, topic_embeddings).mean(axis=1).sum()
+        topic_embeddings = [model.embeddings.word_embeddings.weight[tokenizer.convert_tokens_to_ids(keyword)].detach().numpy() for keyword in keywords]
+        similarity_scores[topic] = cosine_similarity(embeddings.detach().numpy(), topic_embeddings).mean(axis=1).sum()
 
     softmax_scores = {topic: np.exp(score) / np.sum(np.exp(list(similarity_scores.values()))) for topic, score in similarity_scores.items()}
     rounded_scores = {topic: round(score, 2) for topic, score in softmax_scores.items()}
