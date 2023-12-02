@@ -1,3 +1,4 @@
+torch
 seaborn
 pathlib
 colorama
@@ -5,12 +6,12 @@ matplotlib
 transformers
 apify_client
 nltk
-google-cloud-storage
-google-cloud-bigquery
-torch
+# google-cloud-storage
+# google-cloud-bigquery
+
 numpy
 pandas
-mlflow==2.8.1
+mlflow
 scikit-learn
 
 python-dotenv
@@ -18,12 +19,10 @@ python-dotenv
 fastapi
 uvicorn
 
-#pytz
-#httpx
-#pytest-asyncio
-db-dtypes
-#pyarrow
-#prefect==2.8.1
-psycopg2-binary
-wheel
-#tensorflow-estimator == 2.15.0
+# pytz
+# httpx
+# pytest-asyncio
+# db-dtypes
+# pyarrow
+# prefect==2.8.1
+# psycopg2-binary
