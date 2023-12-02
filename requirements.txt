@@ -5,12 +5,12 @@ matplotlib
 transformers
 apify_client
 nltk
-# google-cloud-storage
-# google-cloud-bigquery
+google-cloud-storage
+google-cloud-bigquery
 torch
 numpy
 pandas
-mlflow
+mlflow==2.8.1
 scikit-learn
 
 python-dotenv
@@ -18,10 +18,12 @@ python-dotenv
 fastapi
 uvicorn
 
-# pytz
-# httpx
-# pytest-asyncio
-# db-dtypes
-# pyarrow
-# prefect==2.8.1
-# psycopg2-binary
+#pytz
+#httpx
+#pytest-asyncio
+db-dtypes
+#pyarrow
+#prefect==2.8.1
+psycopg2-binary
+wheel
+#tensorflow-estimator == 2.15.0

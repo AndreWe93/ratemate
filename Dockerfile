@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:2.10.0
+FROM tensorflow/tensorflow:2.15.0
 
 WORKDIR /ratemate_01
 COPY requirements.txt requirements.txt
