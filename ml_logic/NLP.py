@@ -310,6 +310,7 @@ def new_column_NLP(df_preprocessed):
     for n, column in enumerate(new_columns_names):
         try:
             pretrained_model = load_model(name=f'my_NLP_CNN_MLFLOW_model_{n}')
+            print("5")
             #pretrained_model = mlflow.pyfunc.load_model(model_uri="models:/f'my_NLP_CNN_MLFLOW_model_{n}'/'Production'")
         except:
             print('no model in MLflow URL trying to find it localy')

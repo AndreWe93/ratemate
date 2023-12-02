@@ -1,4 +1,4 @@
-FROM python:3.10.6-buster
+FROM tensorflow/tensorflow:2.10.0
 
 WORKDIR /ratemate_01
 COPY requirements.txt requirements.txt

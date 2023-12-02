@@ -153,15 +153,16 @@ def load_model(name, stage="Production") -> keras.Model:
         try:
             model_versions = client.get_latest_versions(name=name, stages=[stage])
             model_uri = model_versions[0].source
-
+            print("1")
             assert model_uri is not None
+            print("2")
         except:
             print(f"\n❌ No model found with name {name} in stage {stage}")
 
             return None
-
+        print("3")
         model = mlflow.tensorflow.load_model(model_uri=model_uri)
-
+        print("4")
         print("✅ Model loaded from MLflow")
         # $CHA_END
         return model
