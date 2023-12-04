@@ -294,14 +294,19 @@ def new_column_NLP(df_preprocessed):
     #
     ####################################
     for n, column in enumerate(y_columns):
-        try:
-            pretrained_model = load_model(name=f'CNN_{column[21:]}')
-        except:
-            print('no model in MLflow URL trying to find it localy')
-        print('********predicting*******')
-        y_pred = predict_NLP(pretrained_model, X)
-        df_preprocessed[new_columns_names[n]] = y_pred
-        print('********done*******')
+
+        pretrained_model = load_model(name=f'CNN_{column[21:]}')
+
+        if pretrained_model is None:
+            print("Model loading failed.")
+
+        else:
+            print(f'********predicting*******\n')
+            y_pred = predict_NLP(pretrained_model, X)
+            df_preprocessed[new_columns_names[n]] = y_pred
+            print('********done*******')
+
+
 
     return df_preprocessed
 
