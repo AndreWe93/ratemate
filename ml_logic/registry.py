@@ -103,17 +103,11 @@ def load_model(name, stage="Production") -> keras.Model:
         print(f"\nLoad latest model from local registry..." )
 
         # Get the latest model version name by the timestamp on disk
-        local_model_directory = os.path.join(LOCAL_REGISTRY_PATH, "models")
-        local_model_paths = glob.glob(f"{local_model_directory}/*")
-
-        if not local_model_paths:
-            return None
-
-        most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
+        model_path = "models/test_1"
 
         print(f"\nLoad latest model from disk...")
 
-        latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+        latest_model = keras.models.load_model(model_path)
 
         print("✅ Model loaded from local disk")
 

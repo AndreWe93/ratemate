@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:2.10.0
+FROM python:3.10.6-buster
 
 WORKDIR /ratemate_01
 COPY requirements.txt requirements.txt
@@ -15,6 +15,7 @@ COPY interface interface
 COPY ml_logic ml_logic
 COPY setup.py setup.py
 COPY params.py params.py
+COPY models models
 
 RUN pip install .
 
