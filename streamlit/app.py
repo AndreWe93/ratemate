@@ -35,15 +35,15 @@ with st.form(key='params_for_api'):
     st.form_submit_button('Get your Score')
 
 params = dict(
-    url = restaurant_url
-    price = price_review_weightage
-    food = food_review_weightage
-    service = service_review_weightage
-    ambience = ambience_review_weightage
+    url = restaurant_url,
+    price = price_review_weightage,
+    food = food_review_weightage,
+    service = service_review_weightage,
+    ambience = ambience_review_weightage,
     local_guide = local_guides_review_weightage
     )
 
-ratemate_api_url = '<OUR API URL>'
+ratemate_api_url = 'https://ratemate-z2kqlvo2ta-ew.a.run.app/'
 response = requests.get(ratemate_api_url, params=params)
 
 
@@ -60,5 +60,5 @@ else:
 
 st.divider()
 
-st.header(f'Restuarant Rating: ⭐️ {original_score} ⭐️')
+#st.header(f'Restuarant Rating: ⭐️ {original_score} ⭐️')
 st.header(f'Your Personal Score: ⭐️ {your_personal_score} ⭐️')
