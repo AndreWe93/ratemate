@@ -109,16 +109,20 @@ your_dataset.to_csv('./raw_data_slim/result.csv', index=True)
 
 
 
-from sklearn.model_selection import GridSearchCV
+# from sklearn.model_selection import GridSearchCV
 
-param_grid = {
-    'estimator__n_estimators': [50, 100, 200],
-    'estimator__max_depth': [None, 5, 10],
-    'estimator__min_samples_split': [2, 5, 10],
-}
+# param_grid = {
+#     'estimator__n_estimators': [50, 100, 200],
+#     'estimator__max_depth': [None, 5, 10],
+#     'estimator__min_samples_split': [2, 5, 10],
+# }
 
-grid_search = GridSearchCV(multi_target_classifier, param_grid, cv=5, n_jobs=-1)
-grid_search.fit(X_train, y_train)
+# grid_search = GridSearchCV(multi_target_classifier, param_grid, cv=5, n_jobs=-1)
+# grid_search.fit(X_train, y_train)
 
-best_params = grid_search.best_params_
-print(best_params)
+# best_params = grid_search.best_params_
+# print(best_params)
+
+# {'estimator__max_depth': None,
+#  'estimator__min_samples_split': 2,
+#  'estimator__n_estimators': 100}

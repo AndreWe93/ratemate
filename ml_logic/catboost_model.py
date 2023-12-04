@@ -46,19 +46,19 @@ mlflow.set_experiment(experiment_name='ratemate_catboost')
 
 with mlflow.start_run() as run:
     learning_rate = 0.4
-    iterations=30
-    depth=15
-    model_output1 = CatBoostClassifier(learning_rate=learning_rate,
-                                       iterations= iterations,
-                                       depth= depth
+    iterations=150
+    #depth=15
+    model_output1 = CatBoostClassifier(#learning_rate=learning_rate,
+                                       #iterations= iterations,
+                                       #depth= depth
                                        )
-    model_output2 = CatBoostClassifier(learning_rate=learning_rate,
-                                       iterations= iterations,
-                                       depth= depth
+    model_output2 = CatBoostClassifier(#learning_rate=learning_rate,
+                                       #iterations= iterations,
+                                       #depth= depth
                                        )
-    model_output3 = CatBoostClassifier(learning_rate=learning_rate,
-                                       iterations= iterations,
-                                       depth= depth
+    model_output3 = CatBoostClassifier(#learning_rate=learning_rate,
+                                       #iterations= iterations,
+                                       #depth= depth
                                        )
 
 
