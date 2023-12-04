@@ -5,7 +5,7 @@ import pandas as pd
 # Take user input for the file path or take the default path
 default_file_path = "./raw_data_slim/merged_slim_file.csv"
 
-path = "./raw_data/Pepenero Schwabing.csv" #just for Katya
+path = "./raw_data_slim/Pepenero Schwabing.csv" #just for Katya
 
 file_path = input(f"Enter full dataset for training with path, default value = : '{default_file_path}'") or default_file_path
 
@@ -18,12 +18,14 @@ print("Data loaded ✅")
 
 print("Training and saving models..")
 
-data, df_full = get_dataset_for_NLP(your_dataset)
+data = get_dataset_for_NLP(your_dataset)
 X, y = get_Xy_for_NLP(data)
 
 pretraining_NLP_models(X,y)
 
 print("All models saved to MLFlow ✅")
+
+
 
 
 in_production()
