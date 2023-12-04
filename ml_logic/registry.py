@@ -88,7 +88,7 @@ def save_model(model: keras.Model = None) -> None:
     return None
 
 
-def load_model(name, stage="Production") -> keras.Model:
+def load_model(name,model_type, stage="Production",) -> keras.Model:
     """
     Return a saved model:
     - locally (latest one in alphabetical order)
@@ -96,7 +96,7 @@ def load_model(name, stage="Production") -> keras.Model:
     - or from MLFLOW (by "stage") if MODEL_TARGET=='mlflow' --> for unit 03 only
 
     Return None (but do not Raise) if no model is found
-
+    model_type = RF/ TF/ CB
     """
 
     if MODEL_TARGET == "local":
@@ -159,10 +159,14 @@ def load_model(name, stage="Production") -> keras.Model:
             print(f"\n❌ No model found with name {name} in stage {stage}")
 
             return None
+        if model_type == 'TF':
+            model = mlflow.tensorflow.load_model(model_uri=model_uri)
 
-        model = mlflow.tensorflow.load_model(model_uri=model_uri)
+            print("✅ Model loaded from MLflow")
+        elif model_type == 'RF' or model_type == 'CB':
+            model = mlflow.sklearn.load_model(model_uri=model_uri)
 
-        print("✅ Model loaded from MLflow")
+            print("✅ Model loaded from MLflow")
         # $CHA_END
         return model
     else:
@@ -219,3 +223,15 @@ def mlflow_run(func):
 
         return results
     return wrapper
+
+
+
+
+
+def check_models(your_experiment_name):
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment(your_experiment_name)
+    runs = mlflow.search_runs()
+    runs_artifacts = runs.artifact_uri
+    for i in range(len(runs_artifacts)):
+        print(runs_artifacts[i])

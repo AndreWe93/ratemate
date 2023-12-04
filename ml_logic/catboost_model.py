@@ -120,20 +120,40 @@ adding new columns to df
 ####################################
 
 
-# text = your_dataset[text_column]
-# numeric = your_dataset[numeric_columns]
-# ####################################
-# #
-# #####################
-# X_flat = [' '.join(row) for row in text[text_column].values.astype('U')]
+text = your_dataset[text_column]
+numeric = your_dataset[numeric_columns]
+####################################
+#
+#####################
+X_flat = [' '.join(row) for row in text[text_column].values.astype('U')]
 
-# X_tfidf = tfidf_vectorizer.transform(X_flat)
-# X_text = pd.DataFrame(X_tfidf.toarray())
-# X_text.columns = X_text.columns.astype(str)
+X_tfidf = tfidf_vectorizer.transform(X_flat)
+X_text = pd.DataFrame(X_tfidf.toarray())
+X_text.columns = X_text.columns.astype(str)
 
-# X_combined = pd.concat([X_text, numeric.reset_index(drop=True)], axis=1)
+X_combined = pd.concat([X_text, numeric.reset_index(drop=True)], axis=1)
 
-# y_pred = multi_target_classifier.predict(X_combined)
-# your_dataset[new_columns_names] = y_pred
-# print('********done*******')
-# your_dataset.to_csv('./raw_data_slim/result.csv', index=True)
+y_pred = multi_target_classifier.predict(X_combined)
+your_dataset[new_columns_names] = y_pred
+print('********done*******')
+your_dataset.to_csv('./raw_data_slim/result.csv', index=True)
+
+
+
+def new_column_NLP(df_preprocessed):
+    """
+    adding new columns to df
+    """
+    ####################################
+
+    for n, column in enumerate(y_columns):
+        try:
+            pretrained_model = load_model(name=f'CNN_{column[21:]}')
+        except:
+            print('no model in MLflow URL trying to find it localy')
+        print('********predicting*******')
+        y_pred = predict_NLP(pretrained_model, X)
+        df_preprocessed[column] = y_pred
+        print('********done*******')
+
+    return df_preprocessed
