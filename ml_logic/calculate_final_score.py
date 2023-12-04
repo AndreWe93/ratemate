@@ -16,7 +16,7 @@ def fill_sub_ratings(df, only_price = False):
 
 def calculate_price_subrating(row):
     # Step 1: Calculate the average of service, food, and atmosphere
-    average_sfa = (row['service_rating'] + row['food_rating'] + row['atmosphere_rating']) / 3
+    average_sfa = (row['reviewDetailedRating/Service'] + row['reviewDetailedRating/Food'] + row['reviewDetailedRating/Atmosphere']) / 3
 
     # Step 2: Calculate the price subrating
     price_subrating = max(1, min(2 * row['stars'] - average_sfa, 5))
@@ -31,9 +31,9 @@ def df_with_price_rating(df):
 def calculate_average_score(row, price_weight, service_weight, atmosphere_weight, food_weight):
     # Explicitly reference the desired columns for rating
     price_rating = row['price_rating']
-    service_rating = row['service_rating']
-    atmosphere_rating = row['atmosphere_rating']
-    food_rating = row['food_rating']
+    service_rating = row['reviewDetailedRating/Service']
+    atmosphere_rating = row['reviewDetailedRating/Atmosphere']
+    food_rating = row['reviewDetailedRating/Food']
 
     # Multiply each rating by its corresponding weight and calculate the weighted sum
     weighted_sum = (
@@ -52,9 +52,9 @@ def calculate_average_score(row, price_weight, service_weight, atmosphere_weight
 def calculate_average_score_class(row, price_weight, service_weight, atmosphere_weight, food_weight):
     # Explicitly reference the desired columns for rating
     price_rating = row['price_rating']
-    service_rating = row['service_rating']
-    atmosphere_rating = row['atmosphere_rating']
-    food_rating = row['food_rating']
+    service_rating = row['reviewDetailedRating/Service']
+    atmosphere_rating = row['reviewDetailedRating/Atmosphere']
+    food_rating = row['reviewDetailedRating/Food']
 
     price_class = row['price']
     service_class = row['service']
