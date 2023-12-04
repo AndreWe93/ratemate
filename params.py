@@ -2,8 +2,8 @@ import os
 import numpy as np
 
 ##################  VARIABLES  ##################
-DATA_SIZE = os.environ.get("DATA_SIZE")
-CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE"))
+#DATA_SIZE = os.environ.get("DATA_SIZE")
+#CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE"))
 MODEL_TARGET = os.environ.get("MODEL_TARGET")
 GCP_PROJECT = os.environ.get("GCP_PROJECT")
 GCP_PROJECT_WAGON = os.environ.get("GCP_PROJECT_WAGON")
@@ -50,7 +50,7 @@ DTYPES_PROCESSED = np.float32
 ################## VALIDATIONS #################
 
 env_valid_options = dict(
-    DATA_SIZE=["1k", "20k", "all"],
+    #DATA_SIZE=["1k", "20k", "all"],
     MODEL_TARGET=["local", "gcs", "mlflow"],
 )
 

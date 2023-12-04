@@ -8,11 +8,11 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras import models, Model
+#from tensorflow.keras import models, Model
 from ml_logic.text_preprocessor import TextPreprocessor
-from ml_logic.registry import load_model, mlflow_transition_model, mlflow_run
-
-
+from ml_logic.registry import load_model, mlflow_transition_model, mlflow_run, save_results
+from params import *
+import json
 import pickle
 
 
@@ -20,7 +20,7 @@ import seaborn as sns
 
 #pip install mlflow
 import mlflow.pyfunc
-from mlflow.keras import save_model
+#from mlflow.keras import save_model
 
 
 """
@@ -56,14 +56,14 @@ new_columns_names = [#"price_rating",
                      ]
 
 
-maxlen = 150
+maxlen = 200
 
-es = EarlyStopping(patience=5)
+es = EarlyStopping(patience=2)
 validation_split=0.3
-epochs=10
-batch_size=16
-embedding_size = 150
-
+epochs=15
+batch_size=32
+embedding_size = 200
+learning_rate = 0.001
 
 
 
@@ -73,16 +73,15 @@ def get_dataset_for_NLP(dataset):
     returns preprocessed: DF for training NLP and original DF
     """
 
-    text_preprocessor = TextPreprocessor(dataset)
-    text_preprocessor.preprocess_dataset()
+    # text_preprocessor = TextPreprocessor(dataset)
+    # text_preprocessor.preprocess_dataset()
 
-    df_full = text_preprocessor.google_reviews_df
-
-
-    data = df_full[columns].copy()
+    # df_full = text_preprocessor.google_reviews_df
+    #df_full.to_csv('./raw_data_slim/merged_slim_file.csv', index=True)
+    data = dataset[columns].copy()
     data.dropna(inplace=True)
 
-    return data, df_full
+    return data
 
 def get_dataset_only_for_NLP(dataset):
     """
@@ -137,33 +136,24 @@ def build_model_nlp_CNN(X, maxlen = maxlen, embedding_size = embedding_size): #u
 
     model = Sequential([
         layers.Embedding(input_dim=vocab_size+1, input_length=maxlen, output_dim=embedding_size, mask_zero=True),
-        layers.Conv1D(30, kernel_size=15, padding='same', activation="relu"),
-        layers.Conv1D(20, kernel_size=10, padding='same', activation="relu"),
-        layers.Flatten(),
-        layers.Dense(30, activation='relu'),
-        layers.Dropout(0.2),
+        layers.Conv1D(128, 5, padding='same', activation='relu'),
+        layers.GlobalMaxPooling1D(),
+        #layers.Conv1D(30, kernel_size=15, padding='same', activation="relu"),
+        #layers.Conv1D(20, kernel_size=10, padding='same', activation="relu"),
+        #layers.Flatten(),
+        layers.Dense(64, activation='relu'),
+        layers.Dropout(0.1),
+        layers.Dense(32, activation='relu'),
+
+        #layers.Dense(30, activation='relu'),
         layers.Dense(1, activation='linear'),
-    ])
 
-#     model.compile(loss='categorical_crossentropy', # different from binary_crossentropy because we have multiple classes
-#                   optimizer='adam', metrics=['accuracy'])
-#     return model
+        #Dense(3)  # Три выходных нейрона для каждой оценки
 
-# model_nlp = build_model_nlp()
-
-# def build_model_nlp():
-#     model = Sequential([
-#         layers.Embedding(input_dim=vocab_size+1, input_length=maxlen, output_dim=embedding_size, mask_zero=True),
-#         layers.Conv1D(32, kernel_size=3, padding='same', activation='relu'),
-#         layers.Conv1D(64, kernel_size=3, padding='same', activation='relu'),
-#         layers.Flatten(),
-#         layers.Dense(128, activation='relu'),
-#         layers.Dropout(0.5),
-#         layers.Dense(1, activation='linear'),
-#     ])
+                ])
 
     model.compile(loss='mean_squared_error', # Using mean squared error for regression
-                  optimizer=Adam(), metrics=['mae'])  # Mean Absolute Error as a metric
+                  optimizer=Adam(learning_rate=learning_rate), metrics=['mae'])  # Mean Absolute Error as a metric
     return model, X_pad
 
 
@@ -182,12 +172,9 @@ def fit_NLP(model, X_pad, y, maxlen = maxlen, n=0): #used within 'pretrained_NLP
             )
     return history
 
-
-@mlflow_run
-def evaluate_NLP(model,
-                 df_test_csv_path = './raw_data/Pepenero Schwabing.csv',
-                 maxlen = maxlen,
-                 n = 0):
+def get_test_data_for_evaluate_NLP(
+                 df_test_csv_path = './raw_data_slim/Pepenero Schwabing.csv',
+                 maxlen = maxlen):
 
     """
     """
@@ -198,20 +185,31 @@ def evaluate_NLP(model,
     except:
         print('create tokenizer_for_NLP first')
 
-    df_test = get_dataset_for_NLP(df_test_csv_path)
+    df_test = get_dataset_for_NLP(pd.read_csv(df_test_csv_path))
     X_test, y_test = get_Xy_for_NLP(df_test)
 
     X_words_test = [text_to_word_sequence(str(sentence)) for sentence in X_test]
     X_tokens_test = tk.texts_to_sequences(X_words_test)
 
     X_pad_test = pad_sequences(X_tokens_test, dtype=float, padding='post', maxlen=maxlen)
+
+    return X_pad_test, y_test
+
+
+
+def evaluate_NLP(model,X_pad_test,y_test,
+                 n = 0):
+
+    """
+    """
     y_pred = model.predict(X_pad_test)
 
     loss, mae = model.evaluate(X_pad_test,y_test[:,n])
 
 
 
-    return X_test, y_test[:,n], y_pred, loss, mae
+    #return X_test, y_test[:,n], y_pred, loss, mae
+    return loss, mae
 
 
 
@@ -235,38 +233,30 @@ def info_NLP(X,y):
 
 
 
-@mlflow_run
+#@mlflow_run
 def pretraining_NLP_models(X,y):
     """
     saving models for loading in 'new_column_NLP'
     """
-
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment(experiment_name='ratemate_NLP_CNN')
     for n, column in enumerate(y_columns):
-        model, X_pad = build_model_nlp_CNN(X)
-        history = fit_NLP(model, X_pad, y, n=n)
-        #models.save_model(model, f'my_NLP_CNN_model_{n}')
+         with mlflow.start_run() as run:
+
+            mlflow.tensorflow.autolog()
+
+            model, X_pad = build_model_nlp_CNN(X)
+            history = fit_NLP(model, X_pad, y, n=n)
+
+            mlflow.tensorflow.log_model(
+                model=model,
+                artifact_path="model",
+                registered_model_name=f'CNN_{column[21:]}',
+
+            )
 
 
-        # mlflow.set_tracking_uri("https://mlflow.lewagon.ai")
-        # mlflow.set_experiment(experiment_name="lewagon_RateMate_NLP")
-        mlflow.tensorflow.log_model(
-                    model=model,
-                    artifact_path="model",
-                    registered_model_name=f'my_NLP_CNN_MLFLOW_model_{n}'
-                )
-
-        print("✅ Model saved to MLflow")
-        # Log the model to MLflow
-        #with mlflow.start_run() as run:
-            # Log parameters, metrics, and the model
-            #lflow.log_metric("mse", mean_squared_error(y_test, model.predict(X_test)))
-
-            # Save the model
-            # try:
-            #     save_model(model, f'my_NLP_CNN_MLFLOW_model_{n}')
-            #     print(f'****model {n} saved****')
-            # except:
-            #     print("oops:folder already exists and is not empty")
+            print("✅ Model saved to MLflow")
 
 
 def predict_NLP(model, X): #used within 'new_column_NLP'
@@ -299,24 +289,15 @@ def new_column_NLP(df_preprocessed):
     ####################################
     #
     ####################################
-
-    # text_preprocessor = TextPreprocessor(path)
-    # text_preprocessor.preprocess_dataset()
-    # df = text_preprocessor.google_reviews_df
     X, y = get_Xy_for_NLP(df_preprocessed)
     ####################################
     #
     ####################################
-    for n, column in enumerate(new_columns_names):
+    for n, column in enumerate(y_columns):
         try:
-            pretrained_model = load_model(name=f'my_NLP_CNN_MLFLOW_model_{n}')
-            #pretrained_model = mlflow.pyfunc.load_model(model_uri="models:/f'my_NLP_CNN_MLFLOW_model_{n}'/'Production'")
+            pretrained_model = load_model(name=f'CNN_{column[21:]}')
         except:
             print('no model in MLflow URL trying to find it localy')
-        # try:
-        #     pretrained_model = models.load_model(f'my_NLP_CNN_model_{n}')
-        # except:
-        #     return print('first save models via method pretrained_NLP_models(X,y)')
         print('********predicting*******')
         y_pred = predict_NLP(pretrained_model, X)
         df_preprocessed[column] = y_pred
@@ -328,13 +309,13 @@ def new_column_NLP(df_preprocessed):
 
 
 def in_production():
-    for n in range(3):
-        mlflow_transition_model(f'my_NLP_CNN_MLFLOW_model_{n}', 'None', 'Production')
+    for n, column in enumerate(y_columns):
+        mlflow_transition_model(f'CNN_{column[21:]}', 'None', 'Production')
     return print('models set as in production')
 
 
 
 
 if __name__ == "__main__":
-    path = "./raw_data/merged_slim_file.csv"
+    path = "./raw_data_slim/Pepenero Schwabing.csv"
     dataset = pd.read_csv(path)
