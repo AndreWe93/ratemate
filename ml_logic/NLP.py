@@ -300,7 +300,7 @@ def new_column_NLP(df_preprocessed):
             print('no model in MLflow URL trying to find it localy')
         print('********predicting*******')
         y_pred = predict_NLP(pretrained_model, X)
-        df_preprocessed[column] = y_pred
+        df_preprocessed[new_columns_names[n]] = y_pred
         print('********done*******')
 
     return df_preprocessed
