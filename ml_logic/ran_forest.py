@@ -10,6 +10,8 @@ from params import *
 from ml_logic.registry import load_model, mlflow_transition_model, mlflow_run, save_results
 import pickle
 
+from mlflow.sklearn import save_model
+
 
 # Take user input for the file path or take the default path
 default_file_path = "./raw_data_slim/merged_slim_file.csv"
@@ -65,11 +67,13 @@ def run_load_RF():
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment(experiment_name='ratemate_random_forest_multi')
 
+
     with mlflow.start_run() as run:
         n_estimators = 10
         # params = {'n_estimators': n_estimators}
         X_train.columns = X_train.columns.astype(str)
         X_test.columns = X_test.columns.astype(str)
+        clf = MultiOutputClassifier(RandomForestClassifier()).fit(X, y)
 
         classifier = RandomForestClassifier(n_estimators=n_estimators)
         multi_target_classifier = MultiOutputClassifier(classifier)
@@ -130,23 +134,26 @@ def new_column_RF(your_dataset, save_local_csv=False):
 
     X_combined = pd.concat([X_text, numeric.reset_index(drop=True)], axis=1)
 
-    for n, column in enumerate(y_columns):
-        mlflow.set_tracking_uri("your_tracking_uri")  # Убедитесь, что это правильный URI
-        mlflow.set_experiment("ratemate_random_forest_multi")
+    models = {}
+    for i in range(len(y_columns)):
+        model = load_model(f'ran_forest_{i}', 'RF')
+        models[f'ran_forest_{i}'] = model
+        print(f'********model loaded*******\n')
 
-        pretrained_model = load_model(f'ran_forest_{n}', 'RF')
-        pretrained_model
-        print(f'********model for column {column[21:]} loaded*******\n')
-        if pretrained_model is None:
-            print("Model loading failed.")
+    # Создание нового экземпляра RandomForestClassifier (или другого базового классификатора)
+    base_classifier = RandomForestClassifier()  # замените на нужный базовый классификатор
+    multi_output_classifier = MultiOutputClassifier(estimator=base_classifier)
+    multi_output_classifier.estimators_ = list(models.values())
 
-        else:
-            print(f'********predicting {column[21:]}*******\n')
-            y_pred = pretrained_model.predict(X_combined)
-            print(f'********adding new column {column[21:]} to your df*******\n')
-            your_dataset[new_columns_names[n]] = y_pred
-            print()
-            print(f'********done {new_columns_names[n]}✅*******\n')
+
+    if multi_output_classifier is None:
+        print("Model loading failed.")
+
+    else:
+        print(f'********predicting*******\n')
+        y_pred = multi_output_classifier.predict(X_combined)
+        your_dataset[new_columns_names] = y_pred
+        print(f'********done {new_columns_names}✅*******\n')
     if save_local_csv == True:
 
         your_dataset.to_csv('./raw_data_slim/RF_result.csv', index=True)
@@ -194,3 +201,12 @@ def search_randomForest():
     # {'estimator__max_depth': None,
     # 'estimator__min_samples_split': 2,
     # 'estimator__n_estimators': 100}
+
+
+model_path = "путь_к_вашей_модели"
+
+# Загрузка модели в MLflow
+mlflow.sklearn.log_model(sk_model=multi_target_classifier, artifact_path="my_model", registered_model_name="my_registered_model")
+
+# Сохранение модели напрямую с использованием MLflow
+save_model(multi_target_classifier, model_path)

@@ -8,11 +8,10 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
-#from tensorflow.keras import models, Model
+from tensorflow.keras import models, Model, utils
 from ml_logic.text_preprocessor import TextPreprocessor
-from ml_logic.registry import load_model, mlflow_transition_model, mlflow_run, save_results
+from ml_logic.registry import *
 from params import *
-import json
 import pickle
 
 
@@ -30,30 +29,6 @@ constants
 #path = "raw_data/merged_slim_file.csv"
 #dataset = pd.read_csv(path)
 
-
-columns = [#"reviewContext/Price per person",
-        #"reviewContext/Service",
-        "reviewDetailedRating/Atmosphere",
-        "reviewDetailedRating/Food",
-        "reviewDetailedRating/Service",
-        'reviews_without_SW',
-        'reviews_with_SW',
-        ]
-y_columns = [#"reviewContext/Price per person",
-        #"reviewContext/Service",
-        "reviewDetailedRating/Atmosphere",
-        "reviewDetailedRating/Food",
-        "reviewDetailedRating/Service"
-        ]
-X_column = [ 'reviews_without_SW',
-        #'reviews_with_SW'
-        ]
-
-new_columns_names = [#"price_rating",
-                     "atmosphere_rating",
-                     "food_rating",
-                     "service_rating"
-                     ]
 
 
 maxlen = 200
@@ -152,14 +127,15 @@ def build_model_nlp_CNN(X, maxlen = maxlen, embedding_size = embedding_size): #u
 
                 ])
 
-    model.compile(loss='mean_squared_error', # Using mean squared error for regression
-                  optimizer=Adam(learning_rate=learning_rate), metrics=['mae'])  # Mean Absolute Error as a metric
+    model.compile(loss='mse',
+                  optimizer=Adam(learning_rate=learning_rate), metrics=['mae'])
+
     return model, X_pad
 
 
 
 
-def fit_NLP(model, X_pad, y, maxlen = maxlen, n=0): #used within 'pretrained_NLP_models'
+def fit_NLP(model, X_pad, y, n=0): #used within 'pretrained_NLP_models'
 
     """
     """
@@ -196,21 +172,19 @@ def get_test_data_for_evaluate_NLP(
     return X_pad_test, y_test
 
 
+# def evaluate_NLP(model,X_pad_test,y_test
+#                  ):
 
-def evaluate_NLP(model,X_pad_test,y_test,
-                 n = 0):
+#     """
+#     """
+#     y_pred = model.predict(X_pad_test)
 
-    """
-    """
-    y_pred = model.predict(X_pad_test)
-
-    loss, mae = model.evaluate(X_pad_test,y_test[:,n])
-
+#     loss, mae = model.evaluate(X_pad_test,y_test)
 
 
-    #return X_test, y_test[:,n], y_pred, loss, mae
-    return loss, mae
 
+#     #return X_test, y_test[:,n], y_pred, loss, mae
+#     return loss, mae
 
 
 def info_NLP(X,y):
@@ -230,8 +204,6 @@ def info_NLP(X,y):
     sns.histplot([len(x) for x in X_tokens]);
 
     print('Imbalanced dataset:',pd.DataFrame(np.unique(y, return_counts=True)))
-
-
 
 #@mlflow_run
 def pretraining_NLP_models(X,y):
@@ -280,7 +252,6 @@ def predict_NLP(model, X): #used within 'new_column_NLP'
     return y_pred
 
 
-
 def new_column_NLP(df_preprocessed):
     """
     adding new columns to df
@@ -294,18 +265,21 @@ def new_column_NLP(df_preprocessed):
     #
     ####################################
     for n, column in enumerate(y_columns):
-        try:
-            pretrained_model = load_model(name=f'CNN_{column[21:]}')
-        except:
-            print('no model in MLflow URL trying to find it localy')
-        print('********predicting*******')
-        y_pred = predict_NLP(pretrained_model, X)
-        df_preprocessed[new_columns_names[n]] = y_pred
-        print('********done*******')
+
+        pretrained_model = load_model(name=f'CNN_{column[21:]}')
+
+        if pretrained_model is None:
+            print("Model loading failed.")
+
+        else:
+            print(f'********predicting*******\n')
+            y_pred = predict_NLP(pretrained_model, X)
+            df_preprocessed[new_columns_names[n]] = y_pred
+            print('********done*******')
+
+
 
     return df_preprocessed
-
-
 
 
 def in_production():
@@ -314,8 +288,105 @@ def in_production():
     return print('models set as in production')
 
 
-
-
 if __name__ == "__main__":
     path = "./raw_data_slim/Pepenero Schwabing.csv"
     dataset = pd.read_csv(path)
+
+def build_model_nlp(X, maxlen = maxlen, embedding_size = embedding_size):
+
+    tk = tokenizer_for_NLP(X)
+    X_tokens = tk.texts_to_sequences(X.tolist())
+    X_pad = pad_sequences(X_tokens, dtype=float, padding='post', maxlen=maxlen)
+
+    vocab_size = len(tk.word_index)
+
+    input_layer = layers.Input(shape=(maxlen,), dtype='int32')
+
+    embedding = layers.Embedding(input_dim=vocab_size + 1, input_length=maxlen, output_dim=embedding_size, mask_zero=True)(input_layer)
+
+    conv1d = layers.Conv1D(128, 5, padding='same', activation='relu')(embedding)
+    maxpool = layers.GlobalMaxPooling1D()(conv1d)
+
+    dense = layers.Dense(64, activation='relu')(maxpool)
+    dropout = layers.Dropout(0.1)(dense)
+    dense_2 = layers.Dense(32, activation='relu')(dropout)
+
+    # Three output neurons for each rating
+    atmosphere_output = layers.Dense(1, activation='linear', name='atmosphere_output')(dense_2)
+    food_output = layers.Dense(1, activation='linear', name='food_output')(dense_2)
+    service_output = layers.Dense(1, activation='linear', name='service_output')(dense_2)
+
+    model = models.Model(inputs=input_layer, outputs=[atmosphere_output, food_output, service_output])
+
+    model.compile(loss='mse', optimizer=Adam(learning_rate=learning_rate), metrics=['mae'])
+
+#     model = Sequential([
+#         layers.Embedding(input_dim=vocab_size+1, input_length=maxlen, output_dim=embedding_size, mask_zero=True),
+#         layers.Conv1D(10, kernel_size=15, padding='same', activation="relu"),
+#         layers.Conv1D(10, kernel_size=10, padding='same', activation="relu"),
+#         layers.Flatten(),
+#         layers.Dense(30, activation='relu'),
+#         layers.Dropout(0.15),
+#         layers.Dense(1, activation='relu'),
+#     ])
+
+#     model.compile(loss="mse", optimizer=Adam(learning_rate=1e-4), metrics=['mae'])
+    return model, X_pad
+
+
+def build_model_num(X_num, y):
+    input_num = layers.Input(shape=(X_num.shape[1],))
+
+    x = layers.Dense(64, activation="relu")(input_num)
+    x = layers.Dense(32, activation="relu")(x)
+    output_num = layers.Dense(1, activation="relu")(x)
+
+    model_num = models.Model(inputs=input_num, outputs=output_num)
+
+    model_num.compile(loss = "mse", optimizer=Adam(learning_rate=5e-4), metrics=['mae'])
+    model_num.fit(X_num, y,
+          validation_split=0.3,
+          epochs=50,
+          batch_size=32,
+          callbacks=[es]
+          )
+
+    return model_num
+
+
+def combined_models():
+
+    model_nlp = build_model_nlp() # comment-out to keep pre-trained weights not to start from scratch
+    input_text = model_nlp.input
+    output_text = model_nlp.output
+
+    model_num = build_model_num() # comment-out to keep pre-trained weights not to start from scratch
+    input_num = model_num.input
+    output_num = model_num.output
+
+    inputs = [input_text, input_num]
+
+    combined = layers.concatenate([output_text, output_num])
+
+    x = layers.Dense(10, activation="relu")(combined)
+
+    outputs = layers.Dense(1, activation="linear")(x)
+
+    model_combined = models.Model(inputs=inputs, outputs=outputs)
+
+    utils.plot_model(model_combined, "multi_input_model.png", show_shapes=True)
+
+    return model_combined
+
+
+def compile_fit_combined_models(model_combined, X_pad, X_num):
+    model_combined.compile(loss="mse", optimizer=Adam(learning_rate=1e-4), metrics=['mae'])
+    es = EarlyStopping(patience=2)
+
+    history = model_combined.fit(x=[X_pad, X_num],
+                    y=y,
+                    validation_split=0.3,
+                    epochs=100,
+                    batch_size=32,
+                    callbacks=[es])
+    return history

@@ -9,7 +9,40 @@ from tensorflow import keras
 
 from params import *
 import mlflow
+import sklearn
 from mlflow.tracking import MlflowClient
+
+
+
+
+columns = [#"reviewContext/Price per person",
+        #"reviewContext/Service",
+        "reviewDetailedRating/Atmosphere",
+        "reviewDetailedRating/Food",
+        "reviewDetailedRating/Service",
+        'reviews_without_SW',
+        'reviews_with_SW',
+        'stars'
+        ]
+y_columns = [#"reviewContext/Price per person",
+        #"reviewContext/Service",
+        "reviewDetailedRating/Atmosphere",
+        "reviewDetailedRating/Food",
+        "reviewDetailedRating/Service"
+        ]
+X_column = [ 'reviews_without_SW',
+        #'reviews_with_SW'
+        ]
+
+new_columns_names = [#"price_rating",
+                     "atmosphere_rating",
+                     "food_rating",
+                     "service_rating"
+                     ]
+
+
+
+
 
 def save_results(params: dict, metrics: dict) -> None:
     """
@@ -30,21 +63,23 @@ def save_results(params: dict, metrics: dict) -> None:
     timestamp = time.strftime("%Y%m%d-%H%M%S")
 
     # # Save params locally
-    # if params is not None:
-    #     params_path = os.path.join(LOCAL_REGISTRY_PATH, "params", timestamp + ".pickle")
-    #     with open(params_path, "wb") as file:
-    #         pickle.dump(params, file)
+    if MODEL_TARGET == "local":
 
-    # # Save metrics locally
-    # if metrics is not None:
-    #     metrics_path = os.path.join(LOCAL_REGISTRY_PATH, "metrics", timestamp + ".pickle")
-    #     with open(metrics_path, "wb") as file:
-    #         pickle.dump(metrics, file)
+        if params is not None:
+            params_path = os.path.join(LOCAL_REGISTRY_PATH, "params", timestamp + ".pickle")
+            with open(params_path, "wb") as file:
+                pickle.dump(params, file)
 
-    # print("✅ Results saved locally")
+        # Save metrics locally
+        if metrics is not None:
+            metrics_path = os.path.join(LOCAL_REGISTRY_PATH, "metrics", timestamp + ".pickle")
+            with open(metrics_path, "wb") as file:
+                pickle.dump(metrics, file)
+
+        print("✅ Results saved locally")
 
 
-def save_model(model: keras.Model = None) -> None:
+def save_model(keras_model: keras.Model = None, sklearn_model: sklearn.base.BaseEstimator = None) -> None:
     """
     Persist trained model locally on the hard drive at f"{LOCAL_REGISTRY_PATH}/models/{timestamp}.h5"
     - if MODEL_TARGET='gcs', also persist it in your bucket on GCS at "models/{timestamp}.h5" --> unit 02 only
@@ -52,12 +87,12 @@ def save_model(model: keras.Model = None) -> None:
     """
 
     timestamp = time.strftime("%Y%m%d-%H%M%S")
+    if MODEL_TARGET == "local":
+        # Save model locally
+        model_path = os.path.join(LOCAL_REGISTRY_PATH, "models", f"{timestamp}.h5")
+        keras_model.save(model_path)
 
-    # Save model locally
-    model_path = os.path.join(LOCAL_REGISTRY_PATH, "models", f"{timestamp}.h5")
-    model.save(model_path)
-
-    print("✅ Model saved locally")
+        print("✅ Model saved locally")
 
     # if MODEL_TARGET == "gcs":
     #     # 🎁 We give you this piece of code as a gift. Please read it carefully! Add a breakpoint if needed!
@@ -72,12 +107,13 @@ def save_model(model: keras.Model = None) -> None:
 
         # return None
 
-    if MODEL_TARGET == "mlflow":
+    if MODEL_TARGET == "mlflow" and keras_model is not None:
+
         # $CHA_BEGIN
         mlflow.tensorflow.log_model(
-            model=model,
+            model=keras_model,
             artifact_path="model",
-            registered_model_name=MLFLOW_MODEL_NAME
+            registered_model_name=MLFLOW_KERAS_MODEL_NAME
         )
 
         print("✅ Model saved to MLflow")
@@ -85,10 +121,21 @@ def save_model(model: keras.Model = None) -> None:
         return None
         # $CHA_END
 
+    if MODEL_TARGET == "mlflow" and sklearn_model is not None:
+        mlflow.sklearn.log_model(
+            sk_model=sklearn_model,
+            artifact_path="model",
+            registered_model_name=MLFLOW_SKLEARN_MODEL_NAME
+        )
+
+        print("✅ Model saved to MLflow")
+
+        return None
+
     return None
 
 
-def load_model(name,model_type, stage="Production",) -> keras.Model:
+def load_model(name,model_type, stage="Production",):
     """
     Return a saved model:
     - locally (latest one in alphabetical order)
@@ -112,14 +159,18 @@ def load_model(name,model_type, stage="Production",) -> keras.Model:
         most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
 
         print(f"\nLoad latest model from disk...")
+        if model_type == 'TF':
+            latest_model = keras.models.load_model(most_recent_model_path_on_disk)
 
-        latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+        elif model_type == 'RF' or model_type == 'CB':
+            latest_model = sklearn.load_model(most_recent_model_path_on_disk)
+
 
         print("✅ Model loaded from local disk")
 
         return latest_model
 
-    elif MODEL_TARGET == "gcs":
+    #elif MODEL_TARGET == "gcs":
     #     # 🎁 We give you this piece of code as a gift. Please read it carefully! Add a breakpoint if needed!
     #     print(Fore.BLUE + f"\nLoad latest model from GCS..." + Style.RESET_ALL)
 
@@ -139,7 +190,7 @@ def load_model(name,model_type, stage="Production",) -> keras.Model:
     #     except:
     #         print(f"\n❌ No model found in GCS bucket {BUCKET_NAME}")
 
-            return None
+    #        return None
 
     elif MODEL_TARGET == "mlflow":
         print(f"\nLoad [{stage}] model from MLflow..." )
