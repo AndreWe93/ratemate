@@ -37,7 +37,7 @@ def predict(
     pre_processed_df = preprocess_reviews_text(df) # Still need to do the column selection
 
     # Classification of reviews
-    classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
+    #classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
 
     # Get subratings
     # Load the production model and calculate subratings (without the price subrating)
@@ -47,7 +47,7 @@ def predict(
     # model = app.state.model
     # assert model is not None
 
-    subratings_df = new_column_NLP(classified_df)
+    subratings_df = new_column_NLP(pre_processed_df)
 
     #subratings_df = create_sub_ratings(classified_df) # This is a place holder
     subratings_df_price = df_with_price_rating(subratings_df)

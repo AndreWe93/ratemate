@@ -76,7 +76,7 @@ def calculate_average_score_class(row, price_weight, service_weight, atmosphere_
 
     return average_score_class
 
-def df_with_score(df, price_weight, service_weight, atmosphere_weight, food_weight, with_class = True):
+def df_with_score(df, price_weight, service_weight, atmosphere_weight, food_weight, with_class = False):
     if with_class is True:
         df['average_score'] = df.apply(calculate_average_score_class,
         args=(price_weight, service_weight, atmosphere_weight, food_weight),

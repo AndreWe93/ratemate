@@ -3,7 +3,7 @@ import pandas as pd
 # !pip install transformers
 
 from transformers import pipeline, BertTokenizer, BertModel
-import torch
+#import torch
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -15,7 +15,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import pandas as pd
 from transformers import BertTokenizer, BertModel
-import torch
+#import torch
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
