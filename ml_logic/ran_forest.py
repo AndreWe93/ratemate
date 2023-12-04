@@ -130,23 +130,26 @@ def new_column_RF(your_dataset, save_local_csv=False):
 
     X_combined = pd.concat([X_text, numeric.reset_index(drop=True)], axis=1)
 
-    for n, column in enumerate(y_columns):
-        mlflow.set_tracking_uri("your_tracking_uri")  # Убедитесь, что это правильный URI
-        mlflow.set_experiment("ratemate_random_forest_multi")
+    models = {}
+    for i in range(len(y_columns)):
+        model = load_model(f'ran_forest_{i}', 'RF')
+        models[f'ran_forest_{i}'] = model
+        print(f'********model loaded*******\n')
 
-        pretrained_model = load_model(f'ran_forest_{n}', 'RF')
-        pretrained_model
-        print(f'********model for column {column[21:]} loaded*******\n')
-        if pretrained_model is None:
-            print("Model loading failed.")
+    # Создание нового экземпляра RandomForestClassifier (или другого базового классификатора)
+    base_classifier = RandomForestClassifier()  # замените на нужный базовый классификатор
+    multi_output_classifier = MultiOutputClassifier(estimator=base_classifier)
+    multi_output_classifier.estimators_ = list(models.values())
 
-        else:
-            print(f'********predicting {column[21:]}*******\n')
-            y_pred = pretrained_model.predict(X_combined)
-            print(f'********adding new column {column[21:]} to your df*******\n')
-            your_dataset[new_columns_names[n]] = y_pred
-            print()
-            print(f'********done {new_columns_names[n]}✅*******\n')
+
+    if multi_output_classifier is None:
+        print("Model loading failed.")
+
+    else:
+        print(f'********predicting*******\n')
+        y_pred = multi_output_classifier.predict(X_combined)
+        your_dataset[new_columns_names] = y_pred
+        print(f'********done {new_columns_names}✅*******\n')
     if save_local_csv == True:
 
         your_dataset.to_csv('./raw_data_slim/RF_result.csv', index=True)
