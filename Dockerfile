@@ -15,7 +15,8 @@ COPY interface interface
 COPY ml_logic ml_logic
 COPY setup.py setup.py
 COPY params.py params.py
-COPY models models
+COPY tokenizer.pkl tokenizer.pkl
+
 
 RUN pip install .
 
