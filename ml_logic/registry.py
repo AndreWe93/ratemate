@@ -4,6 +4,7 @@ import time
 import pickle
 
 #from colorama import Fore, Style
+from colorama import Fore, Style
 from tensorflow import keras
 #from google.cloud import storage
 
@@ -220,8 +221,10 @@ def load_model(name,model_type, stage="Production",):
             print("✅ Model loaded from MLflow")
         # $CHA_END
         return model
+
     else:
         return None
+
 
 
 
