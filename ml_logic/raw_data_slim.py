@@ -87,7 +87,7 @@ if __name__ == "__main__":
     raw_data_folder = "raw_data"
     raw_data_slim_folder = "raw_data_slim"
     #folder_path = '/path/to/your/csv/files'
-    output_path = 'raw_data_slim/merged_slim_file.csv'
+    output_path = 'raw_data_slim/merged_thai_restaurant_file.csv'
     # Process files in raw_data and save them to raw_data_slim
     process_files(raw_data_folder, raw_data_slim_folder)
     merge_slim_files(raw_data_slim_folder, output_path)
