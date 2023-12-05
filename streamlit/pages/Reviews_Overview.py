@@ -12,6 +12,12 @@ from params import *
 st.markdown("""# RateMate
 ## Reviews Overview""")
 
+# '''
+# # TODO:
+# 1. Show the top three reviews from the top three reviewers
+# 2. Top three reviewers are reviewers who wrote the most number of reviews
+# '''
+
 # Function to generate and display a word cloud
 def generate_wordcloud(df):
     wordcloud = WordCloud(max_words=10000, min_font_size=10, height=800, width=1600,
@@ -26,7 +32,6 @@ def generate_wordcloud(df):
 restaurant_url = st.text_input("url of your restaurant")
 
 if st.button("Reviews"):
-    #url = 'https://awtestratemate2-z2kqlvo2ta-ew.a.run.app/scrape'
 
     params = {
             'url': restaurant_url
@@ -36,7 +41,11 @@ if st.button("Reviews"):
 
     # Make API request
     #response = requests.get(url, params=params)
-    df = scrape_apify(url)
+    # df = scrape_apify(url)
+
+    # Placeholder code
+    df = pd.read_csv("./raw_data_slim/merged_slim_file.csv")
+
     df = df[COLUMN_NAMES_RAW]
     pre_processed_df = preprocess_reviews_text(df) # Still need to do the column selection
 

@@ -47,13 +47,19 @@ def predict(
     # model = app.state.model
     # assert model is not None
 
-    subratings_df = new_column_NLP(classified_df)
+    # subratings_df = new_column_NLP(classified_df)
 
-    #subratings_df = create_sub_ratings(classified_df) # This is a place holder
-    subratings_df_price = df_with_price_rating(subratings_df)
+    # #subratings_df = create_sub_ratings(classified_df) # This is a place holder
+    # subratings_df_price = df_with_price_rating(subratings_df)
+
+    # # Average scores
+    # average_scores_df = calculate_average_scores(subratings_df_price, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
+
+
+    subratings_df_random = fill_sub_ratings(classified_df)
 
     # Average scores
-    average_scores_df = calculate_average_scores(subratings_df_price, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
+    average_scores_df = calculate_average_scores(subratings_df_random, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
 
     # Overall score
     overall_score = calculate_overall_score(average_scores_df)

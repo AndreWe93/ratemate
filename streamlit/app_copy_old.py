@@ -32,6 +32,9 @@ ambience_review_weightage = st.slider('Select your ambience rating weight', 0.0,
 # checkbox for local guides
 local_guides_review_weightage = st.checkbox('Review only from local guides')
 
+# Save user input to session state
+st.session_state.restaurant_url = restaurant_url
+
 
 if st.button("Get Score"):
     #url = 'https://awtestratemate2-z2kqlvo2ta-ew.a.run.app/scrape'
@@ -47,7 +50,9 @@ if st.button("Get Score"):
 
     # Make API request
     #response = requests.get(url, params=params)
-    df = scrape_apify(url)
+    # df = scrape_apify(url)
+    df = pd.read_csv("./raw_data_slim/merged_slim_file.csv")
+    df = df.head(1000).copy()
     df = df[COLUMN_NAMES_RAW]
     pre_processed_df = preprocess_reviews_text(df) # Still need to do the column selection
 
@@ -82,3 +87,7 @@ if st.button("Get Score"):
     st.header(f'Restuarant Rating: ⭐️ {original_score} ⭐️')
 
     st.header(f'Your Personal Score: ⭐️ {overall_score} ⭐️')
+
+# Create a link to navigate to the next page
+if st.button("Reviews Overview"):
+    st.session_state.page = "Reviews_Overview"
