@@ -220,8 +220,10 @@ def load_model(name,model_type, stage="Production",):
             print("✅ Model loaded from MLflow")
         # $CHA_END
         return model
+
     else:
         return None
+
 
 
 
