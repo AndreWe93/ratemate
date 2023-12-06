@@ -69,10 +69,16 @@ def predict(
     # Overall score
     overall_score = calculate_overall_score(average_scores_df)
 
+    sub_ratings = individual_scores(average_scores_df)
+
     return {"personal_score": overall_score,
             "top_1": top3_reviews[0],
             "top_2": top3_reviews[1],
-            "top_3": top3_reviews[2]
+            "top_3": top3_reviews[2],
+            "sub_price": sub_ratings[0],
+            "sub_service": sub_ratings[1],
+            "sub_atmosphere": sub_ratings[2],
+            "sub_food": sub_ratings[3]
             }
 
 @app.get("/")
