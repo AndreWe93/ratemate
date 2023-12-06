@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from ml_logic.tfdf import numeric_columns, new_columns_names, text_column, y_columns, get_dataset_only_for_tfdf
+from ml_logic.registry import numeric_columns, new_columns_names, text_column, y_columns, get_dataset_only_for_tfdf
 import pandas as pd
 import mlflow
 from params import *
