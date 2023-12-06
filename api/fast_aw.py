@@ -40,6 +40,7 @@ def predict(
 
     df = df[COLUMN_NAMES_RAW]
     pre_processed_df = preprocess_reviews_text(df) # Still need to do the column selection
+    wordcloud_input = " ".join(pre_processed_df["reviews_without_SW"].astype(str))
 
     # Classification of reviews
     classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
@@ -78,7 +79,8 @@ def predict(
             "sub_price": sub_ratings[0],
             "sub_service": sub_ratings[1],
             "sub_atmosphere": sub_ratings[2],
-            "sub_food": sub_ratings[3]
+            "sub_food": sub_ratings[3],
+            "wordcloud_input": wordcloud_input
             }
 
 @app.get("/")

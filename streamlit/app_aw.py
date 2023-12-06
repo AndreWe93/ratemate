@@ -1,5 +1,8 @@
-import streamlit as st
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 import requests
+import streamlit as st
+
 
 
 # ####### TO Dos #########
@@ -48,6 +51,11 @@ if st.button("Get Score"):
     top_1_review = response.json()["top_1"]
     top_2_review = response.json()["top_2"]
     top_3_review = response.json()["top_3"]
+    sub_price = response.json()["sub_price"]
+    sub_service = response.json()["sub_service"]
+    sub_atmosphere = response.json()["sub_atmosphere"]
+    sub_food = response.json()["sub_food"]
+    wordcloud_input = response.json()["wordcloud_input"]
 
     st.divider()
 
@@ -57,3 +65,17 @@ if st.button("Get Score"):
     st.markdown(f'Top 1: {top_1_review}')
     st.markdown(f'Top 2: {top_2_review}')
     st.markdown(f'Top 3: {top_3_review}')
+    st.header("Here are the sub ratings")
+    st.markdown(f'sub rating for price: {sub_price}')
+    st.markdown(f'sub rating for service: {sub_service}')
+    st.markdown(f'sub rating for atmosphere: {sub_atmosphere}')
+    st.markdown(f'sub rating for food: {sub_food}')
+
+    wordcloud = WordCloud(max_words=10000, min_font_size=10, height=800, width=1600,
+               background_color="white", colormap="viridis").generate(wordcloud_input)
+
+    # Display the word cloud using Matplotlib
+    fig = plt.figure(figsize=(20,20))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    st.pyplot(fig)

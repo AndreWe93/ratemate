@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from apify_client import ApifyClient
 
-def scrape_apify(url, maxReviews = 20, reviewsSort = "newest", language = "en", personalData = True,
+def scrape_apify(url, maxReviews = 100, reviewsSort = "newest", language = "en", personalData = True,
                  token = "apify_api_Nrud6TSWGlModOZyMcaSFyTpnY73hF1Kob5x"):
     # Initialize the ApifyClient with your API token
     client = ApifyClient(token) # AWs token, will expire 30.11.2023
