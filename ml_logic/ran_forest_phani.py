@@ -53,6 +53,21 @@ def basic_data_prep(your_dataset):
     return y, text, numeric
 
 
+def basic_data_prep_predict(your_dataset):
+    '''
+    Does basic data handling and returns X, y
+    '''
+    print("Preparing dataset...")
+
+    y = your_dataset[y_columns]
+    text = your_dataset[text_column]
+    numeric = your_dataset[numeric_columns]
+
+    print("X, y prepared ✅")
+
+    return y, text, numeric
+
+
 def tfidf_vectorizer_train_data(your_dataset):
     '''
     fits with train data and returns tfidf vectorizer
@@ -72,9 +87,9 @@ def tfidf_vectorizer_predict_data(your_dataset):
     '''
     Loads the vectorizer and returns X
     '''
-    y = basic_data_prep(your_dataset)[0]
-    text = basic_data_prep(your_dataset)[1]
-    numeric = basic_data_prep(your_dataset)[2]
+    y = basic_data_prep_predict(your_dataset)[0]
+    text = basic_data_prep_predict(your_dataset)[1]
+    numeric = basic_data_prep_predict(your_dataset)[2]
 
     X_flat = [' '.join(row) for row in text[text_column].values.astype('U')]
 
@@ -168,7 +183,6 @@ def pred_from_random_forest(your_dataset):
     Predicts with the model
     '''
     X = tfidf_vectorizer_predict_data(your_dataset)[0]
-    y = tfidf_vectorizer_predict_data(your_dataset)[1]
 
     X.columns = X.columns.astype(str)
 
@@ -178,7 +192,7 @@ def pred_from_random_forest(your_dataset):
 
     y_pred = loaded_model.predict(X)
 
-    result_df = get_dataset_only_for_tfdf(your_dataset)
+    result_df = your_dataset
     result_df[new_columns_names] = y_pred
 
     print("\n✅ prediction done: ", new_columns_names)
