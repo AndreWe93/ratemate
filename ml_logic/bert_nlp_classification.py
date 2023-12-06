@@ -26,10 +26,10 @@ def load_bert_model(model_name='bert-base-uncased'):
 
 def define_topic_related_words():
     topic_related_words = {
-        'price': ['price', 'cost', 'cheap', 'expensive'],
+        'price': ['price'],
         'service': ['service', 'staff', 'customer', 'experience'],
-        'atmosphere': ['atmosphere', 'ambiance', 'decor', 'vibe'],
-        'food': ['food', 'dish', 'menu', 'flavor']
+        'atmosphere': ['atmosphere', 'ambiance', 'decor', 'vibe', 'place', 'room', 'cosy', 'design', 'comfortable'],
+        'food': ['food', 'dish', 'menu', 'flavor', 'quality', 'warm', 'cold', 'portion']
     }
     return topic_related_words
 
