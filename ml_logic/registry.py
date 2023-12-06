@@ -3,9 +3,7 @@ import os
 import time
 import pickle
 
-#from colorama import Fore, Style
 from tensorflow import keras
-#from google.cloud import storage
 
 from params import *
 import mlflow
@@ -33,6 +31,8 @@ y_columns = [#"reviewContext/Price per person",
 X_column = [ 'reviews_without_SW',
         #'reviews_with_SW'
         ]
+
+numeric_columns = ['stars']
 
 new_columns_names = [#"price_rating",
                      "atmosphere_rating",
@@ -92,7 +92,7 @@ def save_model(keras_model: keras.Model = None, sklearn_model: sklearn.base.Base
         model_path = os.path.join(LOCAL_REGISTRY_PATH, "models", f"{timestamp}.h5")
         keras_model.save(model_path)
 
-        print("✅ Model saved locally")
+        print(f"✅ Model saved locally: {model_path}")
 
     # if MODEL_TARGET == "gcs":
     #     # 🎁 We give you this piece of code as a gift. Please read it carefully! Add a breakpoint if needed!
