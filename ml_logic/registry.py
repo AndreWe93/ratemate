@@ -28,7 +28,7 @@ y_columns = [#"reviewContext/Price per person",
         "reviewDetailedRating/Food",
         "reviewDetailedRating/Service"
         ]
-X_column = [ 'reviews_without_SW',
+X_column = ['reviews_without_SW',
         #'reviews_with_SW'
         ]
 

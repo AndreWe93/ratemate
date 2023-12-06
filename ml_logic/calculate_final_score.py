@@ -16,7 +16,7 @@ def fill_sub_ratings(df, only_price = False):
 
 def calculate_price_subrating(row):
     # Step 1: Calculate the average of service, food, and atmosphere
-    average_sfa = (row['reviewDetailedRating/Service'] + row['reviewDetailedRating/Food'] + row['reviewDetailedRating/Atmosphere']) / 3
+    average_sfa = (row['service_rating'] + row['food_rating'] + row['atmosphere_rating']) / 3
 
     # Step 2: Calculate the price subrating
     price_subrating = max(1, min(2 * row['stars'] - average_sfa, 5))
@@ -99,4 +99,4 @@ def individual_scores(df):
     average_food = round(df.food_rating.mean(),2)
     average_atmosphere = round(df.atmosphere_rating.mean(),2)
 
-    return average_price, average_service, average_atmosphere,average_food
+    return average_price, average_service, average_atmosphere, average_food

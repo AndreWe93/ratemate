@@ -4,27 +4,66 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from ml_logic.registry import numeric_columns, new_columns_names, text_column, y_columns, get_dataset_only_for_tfdf
+from ml_logic.text_preprocessor import TextPreprocessor
+from ml_logic.registry import mlflow_transition_model
+
 import pandas as pd
 import mlflow
 from params import *
-from ml_logic.registry import load_model, mlflow_transition_model
 import pickle
 
-from mlflow.sklearn import save_model
 from mlflow.models import infer_signature
 
+# Columns definition
+columns = [
+        "reviewDetailedRating/Atmosphere",
+        "reviewDetailedRating/Food",
+        "reviewDetailedRating/Service",
+        'reviews_without_SW',
+        'reviews_with_SW',
+        'stars'
+        ]
 
-# File path for the training dataset
-default_file_path = "../raw_data_slim/merged_slim_file.csv"
+y_columns = [
+        "reviewDetailedRating/Atmosphere",
+        "reviewDetailedRating/Food",
+        "reviewDetailedRating/Service"
+        ]
 
+X_column = ['reviews_without_SW']
+
+numeric_columns = ['stars']
+
+new_columns_names = [
+                     "atmosphere_rating",
+                     "food_rating",
+                     "service_rating"
+                     ]
+
+
+# Loading and Preprocessing the dataset
+def load_dataset_train(file_path="./raw_data_slim/merged_slim_file.csv"):
+    return pd.read_csv(file_path)
+
+def preprocess_reviews_text_train(df):
+    '''
+    1. Creates new column with all the english reviews (Combination of #Text and #TranslatedText)
+    2. NLP Preprocessing
+    2.1 Creates a new column with NLP preprocessed text with Stopwords
+    2.2 Creates a new column with NLP preprocessed text without Stopwords
+    3. Keeps all the review columns except for the new NLP preprocessed text
+    '''
+    text_preprocessor = TextPreprocessor(df)
+    text_preprocessor.preprocess_dataset()
+    processed_df = text_preprocessor.google_reviews_df
+    return processed_df
 
 def tfidf_vectorizer(text):
     """
     Returns TF-IDF representation of text and saves the tokenizer to a 'pkl' file
     """
     # Convert text to TF-IDF representation
-    X_flat = [' '.join(row) for row in text[text_column].values.astype('U')]
+    X_flat = [' '.join(row) for row in text[X_column].values.astype('U')]
 
     tfidf_vectorizer = TfidfVectorizer()
     tfidf_vectorizer = tfidf_vectorizer.fit(X_flat)
@@ -42,10 +81,11 @@ def basic_data_prep(your_dataset):
     Does basic data handling and returns X, y
     '''
     print("Preparing dataset...")
-    data = get_dataset_only_for_tfdf(your_dataset)
+    data = your_dataset[columns].copy()
+    data.dropna(inplace=True)
 
     y = data[y_columns]
-    text = data[text_column]
+    text = data[X_column]
     numeric = data[numeric_columns]
 
     print("X, y prepared ✅")
@@ -60,7 +100,7 @@ def basic_data_prep_predict(your_dataset):
     print("Preparing dataset...")
 
     y = your_dataset[y_columns]
-    text = your_dataset[text_column]
+    text = your_dataset[X_column]
     numeric = your_dataset[numeric_columns]
 
     print("X, y prepared ✅")
@@ -91,7 +131,7 @@ def tfidf_vectorizer_predict_data(your_dataset):
     text = basic_data_prep_predict(your_dataset)[1]
     numeric = basic_data_prep_predict(your_dataset)[2]
 
-    X_flat = [' '.join(row) for row in text[text_column].values.astype('U')]
+    X_flat = [' '.join(row) for row in text[X_column].values.astype('U')]
 
     try: # Load the tokenizer from the file
         with open('tfidf_vectorizer.pkl', 'rb') as file:
@@ -116,12 +156,12 @@ def train_model_random_forest(your_dataset):
     # Split the dataset
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+
     # Set up MLflow
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment(experiment_name='ratemate_random_forest_multi')
 
     with mlflow.start_run() as run:
-
         n_estimators = 10
         X_train.columns = X_train.columns.astype(str)
         X_test.columns = X_test.columns.astype(str)
@@ -135,7 +175,7 @@ def train_model_random_forest(your_dataset):
         mlflow.sklearn.log_model(
             sk_model=multi_target_classifier,
             artifact_path="model",
-            registered_model_name="ran_forest_main",
+            registered_model_name="ran_forest",
             signature=signature
         )
 
@@ -175,7 +215,18 @@ def train_model_random_forest(your_dataset):
                 signature=signature_single
             )
 
+    run_id = run.info.run_id
+    print(f"Run ID: {run_id}")
+    mlflow.end_run()
+
+
     print("✅ train() done \n")
+
+
+def in_production(y_columns=y_columns):
+    for n, column in enumerate(y_columns):
+        mlflow_transition_model(f'random_forest_{n}', 'None', 'Production')
+    return print('model set as in production')
 
 
 def pred_from_random_forest(your_dataset):
@@ -187,7 +238,7 @@ def pred_from_random_forest(your_dataset):
     X.columns = X.columns.astype(str)
 
     #logged_model = 'runs:/{MLFLOW_RUN_ID}/model'
-    logged_model = 'runs:/a456f205832d406ba3685a11a8dc2b7c/model'
+    logged_model = 'runs:/a32c466f4a7b498c89ed7c39fbfb8d76/model'
     loaded_model = mlflow.sklearn.load_model(logged_model)
 
     y_pred = loaded_model.predict(X)
@@ -197,3 +248,8 @@ def pred_from_random_forest(your_dataset):
 
     print("\n✅ prediction done: ", new_columns_names)
     return result_df
+
+if __name__ == "__main__":
+    train_dataset = load_dataset_train()
+    processed_df_train = preprocess_reviews_text_train(train_dataset)
+    train_model_random_forest(processed_df_train)

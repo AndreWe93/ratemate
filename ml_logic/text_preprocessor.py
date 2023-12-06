@@ -2,6 +2,7 @@
 Text Preprocessor
 """
 import pandas as pd
+import numpy as np
 
 import string
 
@@ -36,6 +37,7 @@ class TextPreprocessor:
         '''
         NLP preprocessing with stopwords (Stopwords are not removed)
         '''
+        # Drop the nan values
         sentence = sentence.strip()
         sentence = sentence.lower()
         sentence = ''.join(char for char in sentence if not char.isdigit())
@@ -49,8 +51,8 @@ class TextPreprocessor:
 
         cleaned_sentence = ' '.join(word for word in lemmatized)
 
-        # if cleaned_sentence == 'nan':
-        #     cleaned_sentence = np.nan
+        if cleaned_sentence == 'nan':
+            cleaned_sentence = np.nan
 
         return cleaned_sentence
 
@@ -58,6 +60,7 @@ class TextPreprocessor:
         '''
         NLP preprocessing without stopwords (Stopwords are removed)
         '''
+        # Drop the nan values
         sentence = sentence.strip()
         sentence = sentence.lower()
         sentence = ''.join(char for char in sentence if not char.isdigit())
@@ -74,8 +77,8 @@ class TextPreprocessor:
 
         cleaned_sentence = ' '.join(word for word in lemmatized)
 
-        # if cleaned_sentence == 'nan':
-        #     cleaned_sentence = np.nan
+        if cleaned_sentence == 'nan':
+            cleaned_sentence = np.nan
 
         return cleaned_sentence
 
@@ -89,13 +92,16 @@ class TextPreprocessor:
         # NLP preprocessing without stopwords removal
         self.google_reviews_df["reviews_with_SW"] = self.google_reviews_df['review_english'].apply(
             self.preprocessing_with_stopwords)
+        self.google_reviews_df = self.google_reviews_df.dropna(subset=['reviews_with_SW'])
 
         # NLP preprocessing with stopwords removal
         self.google_reviews_df["reviews_without_SW"] = self.google_reviews_df['review_english'].apply(
             self.preprocessing_without_stopwords)
+        self.google_reviews_df = self.google_reviews_df.dropna(subset=['reviews_without_SW'])
 
         # Dropping original reviews columns
         self.google_reviews_df.drop(columns=['text', 'textTranslated', 'review_english'], inplace=True)
+
 
         # # Converting publishedAtDate column format to datetime
         # self.google_reviews_df.publishedAtDate = pd.to_datetime(self.google_reviews_df.publishedAtDate)

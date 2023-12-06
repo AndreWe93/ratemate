@@ -1,11 +1,12 @@
-import pandas as pd
+from params import *
+from interface.main import *
+
+from ml_logic.calculate_final_score import *
+from ml_logic.scrape_apify import scrape_apify
+from ml_logic.random_forest_model import pred_from_random_forest
+
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from ml_logic.scrape_apify import scrape_apify
-from interface.main import *
-from params import *
-from ml_logic.NLP import new_column_NLP
-from ml_logic.calculate_final_score import *
 
 app = FastAPI()
 
@@ -18,8 +19,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-#app.state.model = load_model()
-
 @app.get("/personal_score")
 def predict(
     url: str,
@@ -27,7 +26,6 @@ def predict(
     food_review_weightage: float = Query(..., ge=0, le=1),
     service_review_weightage: float = Query(..., ge=0, le=1),
     ambience_review_weightage: float = Query(..., ge=0, le=1),
-    local_guides_review_weightage: bool = Query(...),
 ):
     """
     """
@@ -40,31 +38,18 @@ def predict(
     classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
 
     # Get subratings
-    # Load the production model and calculate subratings (without the price subrating)
-    # Fill n the price subrating after figuring it out
-    # In the end don't use fill_sub_ratings function
+    subratings_df = pred_from_random_forest(classified_df)
 
-    # model = app.state.model
-    # assert model is not None
-
-    # subratings_df = new_column_NLP(classified_df)
-
-    # #subratings_df = create_sub_ratings(classified_df) # This is a place holder
-    # subratings_df_price = df_with_price_rating(subratings_df)
-
-    # # Average scores
-    # average_scores_df = calculate_average_scores(subratings_df_price, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
-
-
-    subratings_df_random = fill_sub_ratings(classified_df)
+    # Get subratings for price
+    subratings_df_price = df_with_price_rating(subratings_df)
 
     # Average scores
-    average_scores_df = calculate_average_scores(subratings_df_random, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
+    average_scores_df = calculate_average_scores(subratings_df_price, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
 
     # Overall score
-    overall_score = calculate_overall_score(average_scores_df)
+    personal_score = calculate_overall_score(average_scores_df)
 
-    return f"Your personal score is: {overall_score}"
+    return f"RateMate Rating: ⭐️ {personal_score} ⭐️"
 
 @app.get("/")
 def root():

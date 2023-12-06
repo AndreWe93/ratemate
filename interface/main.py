@@ -3,7 +3,8 @@ import pandas as pd
 from ml_logic.text_preprocessor import TextPreprocessor
 from ml_logic.bert_nlp_classification import process_reviews
 from ml_logic.calculate_final_score import *
-from ml_logic.NLP import new_column_NLP
+
+from ml_logic.random_forest_model import pred_from_random_forest
 
 def load_dataset(file_path="./raw_data_slim/merged_slim_file.csv"):
     return pd.read_csv(file_path)
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     # classify_reviews_df = process_reviews(processed_df, "reviews_without_SW")
     print("Classified reviews ✅")
 
-    subratings_df_small = new_column_NLP(classify_reviews_df_small)
+    subratings_df_small = pred_from_random_forest(classify_reviews_df_small)
     subratings_df_price_small = df_with_price_rating(subratings_df_small)
     # subratings_df = new_column_NLP(classify_reviews_df)
     # subratings_df_price = df_with_price_rating(subratings_df)

@@ -1,11 +1,13 @@
 import streamlit as st
-import requests
 
-from ml_logic.scrape_apify import scrape_apify
-from ml_logic.NLP import new_column_NLP
+from ml_logic.random_forest_model import pred_from_random_forest
 from ml_logic.calculate_final_score import *
+
 from interface.main import *
 from params import *
+
+import requests
+from ml_logic.scrape_apify import scrape_apify
 
 # ####### TO Dos #########
 # """
@@ -22,6 +24,33 @@ Hello friend, please insert the google maps url of the restaurant you are intere
 
 # get the user input
 restaurant_url = st.text_input("url of your restaurant")
+
+import streamlit as st
+
+st.title("Adjust Sliders (Sum to 1.0)")
+
+# Function to create sliders with a constraint on the sum
+def create_sliders(num_sliders):
+    # Create sliders with initial values
+    sliders = [st.slider(f"Slider {i + 1}", 0.0, 1.0, value=1.0 / num_sliders) for i in range(num_sliders)]
+
+    # Calculate the sum of slider values
+    total_sum = sum(sliders)
+
+    # Normalize sliders to ensure the sum is 1.0
+    normalized_sliders = [slider / total_sum for slider in sliders]
+
+    return normalized_sliders
+
+# Number of sliders
+num_sliders = 3
+
+# Create sliders with a constraint on the sum
+sliders = create_sliders(num_sliders)
+
+# Display the normalized slider values
+st.write("Normalized Slider Values:", sliders)
+
 
 # the selected value is returned by st.slider
 price_review_weightage = st.slider('Select your price rating weight', 0.0, 1.0, 0.25)
@@ -56,29 +85,21 @@ if st.button("Get Score"):
     df = df[COLUMN_NAMES_RAW]
     pre_processed_df = preprocess_reviews_text(df) # Still need to do the column selection
 
+
     # Classification of reviews
     classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
 
     # Get subratings
-    # Load the production model and calculate subratings (without the price subrating)
-    # Fill n the price subrating after figuring it out
-    # In the end don't use fill_sub_ratings function
+    subratings_df = pred_from_random_forest(classified_df)
 
-    # model = app.state.model
-    # assert model is not None
-    #subratings_df = new_column_NLP(classified_df)
-
-    #subratings_df = create_sub_ratings(classified_df) # This is a place holder
-    #subratings_df_price = df_with_price_rating(subratings_df)
-
-    #subratings_df = create random sub_ratings
-    subratings_df_random = fill_sub_ratings(classified_df)
+    # Get subratings for price
+    subratings_df_price = df_with_price_rating(subratings_df)
 
     # Average scores
-    average_scores_df = calculate_average_scores(subratings_df_random, price, service, ambience, food)
+    average_scores_df = calculate_average_scores(subratings_df_price, price_review_weightage, service_review_weightage, ambience_review_weightage, food_review_weightage)
 
     # Overall score
-    overall_score = calculate_overall_score(average_scores_df)
+    personal_score = calculate_overall_score(average_scores_df)
 
     # Original score
     original_score = round(df.stars.mean(), 2)
@@ -86,7 +107,7 @@ if st.button("Get Score"):
     st.divider()
     st.header(f'Restuarant Rating: ⭐️ {original_score} ⭐️')
 
-    st.header(f'Your Personal Score: ⭐️ {overall_score} ⭐️')
+    st.header(f'Your Personal Score: ⭐️ {personal_score} ⭐️')
 
 # Create a link to navigate to the next page
 if st.button("Reviews Overview"):
