@@ -16,6 +16,7 @@ COPY ml_logic ml_logic
 COPY setup.py setup.py
 COPY params.py params.py
 COPY tokenizer.pkl tokenizer.pkl
+COPY tfidf_vectorizer.pkl tfidf_vectorizer.pkl
 
 RUN pip install .
 
