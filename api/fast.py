@@ -31,8 +31,14 @@ def predict(
     """
     url = url
     df = scrape_apify(url)
+
+    df_nan = df[df['text'].notna()]
+    sorted_df = df_nan.sort_values(by='reviewerNumberOfReviews', ascending=False)
+    top3_reviews = list(sorted_df.head(3)['text'])
+
     df = df[COLUMN_NAMES_RAW]
     pre_processed_df = preprocess_reviews_text(df) # Still need to do the column selection
+    wordcloud_input = " ".join(pre_processed_df["reviews_without_SW"].astype(str))
 
     # Classification of reviews
     classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
@@ -48,8 +54,19 @@ def predict(
 
     # Overall score
     personal_score = calculate_overall_score(average_scores_df)
+    sub_ratings = individual_scores(average_scores_df)
 
-    return f"RateMate Rating: ⭐️ {personal_score} ⭐️"
+    #return f"RateMate Rating: ⭐️ {personal_score} ⭐️"
+    return {"personal_score": personal_score,
+                "top_1": top3_reviews[0],
+                "top_2": top3_reviews[1],
+                "top_3": top3_reviews[2],
+                "sub_price": sub_ratings[0],
+                "sub_service": sub_ratings[1],
+                "sub_atmosphere": sub_ratings[2],
+                "sub_food": sub_ratings[3],
+                "wordcloud_input": wordcloud_input
+                }
 
 @app.get("/")
 def root():

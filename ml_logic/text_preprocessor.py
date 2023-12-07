@@ -55,7 +55,7 @@ class TextPreprocessor:
 
         cleaned_sentence = ' '.join(word for word in lemmatized)
 
-        if cleaned_sentence == 'nan':
+        if cleaned_sentence == 'nan' or cleaned_sentence == '' or cleaned_sentence == 'none':
             cleaned_sentence = np.nan
 
         return cleaned_sentence
@@ -81,7 +81,7 @@ class TextPreprocessor:
 
         cleaned_sentence = ' '.join(word for word in lemmatized)
 
-        if cleaned_sentence == 'nan':
+        if cleaned_sentence == 'nan' or cleaned_sentence == '' or cleaned_sentence == 'none':
             cleaned_sentence = np.nan
 
         return cleaned_sentence
