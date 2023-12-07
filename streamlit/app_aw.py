@@ -1,5 +1,4 @@
-#import wordcloud
-#from wordcloud import WordCloud
+from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import requests
 import streamlit as st
@@ -78,11 +77,11 @@ if st.button("Get Score"):
     st.markdown(f'distribution for atmosphere: {dist_atmosphere}')
     st.markdown(f'distribution for food: {dist_food}')
 
-    #wordcloud = WordCloud(max_words=10000, min_font_size=10, height=800, width=1600,
-               #background_color="white", colormap="viridis").generate(wordcloud_input)
+    wordcloud = WordCloud(max_words=10000, min_font_size=10, height=800, width=1600,
+               background_color="white", colormap="viridis").generate(wordcloud_input)
 
     # Display the word cloud using Matplotlib
-    #fig = plt.figure(figsize=(20,20))
-    #plt.imshow(wordcloud, interpolation='bilinear')
-    #plt.axis('off')
-    #st.pyplot(fig)
+    fig = plt.figure(figsize=(20,20))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    st.pyplot(fig)
