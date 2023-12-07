@@ -238,7 +238,7 @@ def pred_from_random_forest(your_dataset):
     X.columns = X.columns.astype(str)
 
     #logged_model = 'runs:/{MLFLOW_RUN_ID}/model'
-    logged_model = 'runs:/a32c466f4a7b498c89ed7c39fbfb8d76/model'
+    logged_model = 'runs:/bd7884accc114cf2ae05e29a1e6da74f/model'
     loaded_model = mlflow.sklearn.load_model(logged_model)
 
     y_pred = loaded_model.predict(X)
