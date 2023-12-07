@@ -38,8 +38,7 @@ if st.button("Get Score"):
             'price_review_weightage': price_review_weightage,
             'food_review_weightage': food_review_weightage,
             'service_review_weightage': service_review_weightage,
-            'ambience_review_weightage': ambience_review_weightage,
-            'local_guides_review_weightage': local_guides_review_weightage
+            'ambience_review_weightage': ambience_review_weightage
             }
 
 
@@ -56,6 +55,10 @@ if st.button("Get Score"):
     sub_atmosphere = response.json()["sub_atmosphere"]
     sub_food = response.json()["sub_food"]
     wordcloud_input = response.json()["wordcloud_input"]
+    dist_price = response.json()["dist_price"]
+    dist_service = response.json()["dist_service"]
+    dist_atmosphere = response.json()["dist_atmosphere"]
+    dist_food = response.json()["dist_food"]
 
     st.divider()
 
@@ -70,6 +73,11 @@ if st.button("Get Score"):
     st.markdown(f'sub rating for service: {sub_service}')
     st.markdown(f'sub rating for atmosphere: {sub_atmosphere}')
     st.markdown(f'sub rating for food: {sub_food}')
+    st.header("Here are the topic distributions")
+    st.markdown(f'distribution for price: {dist_price}')
+    st.markdown(f'distribution for service: {dist_service}')
+    st.markdown(f'distribution for atmosphere: {dist_atmosphere}')
+    st.markdown(f'distribution for food: {dist_food}')
 
     wordcloud = WordCloud(max_words=10000, min_font_size=10, height=800, width=1600,
                background_color="white", colormap="viridis").generate(wordcloud_input)
