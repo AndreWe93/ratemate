@@ -6,12 +6,16 @@ COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip
 
 RUN pip install -r requirements.txt
+RUN python -m nltk.downloader punkt
+RUN python -m nltk.downloader wordnet
+RUN python -m nltk.downloader stopwords
 
 COPY api api
 COPY interface interface
 COPY ml_logic ml_logic
 COPY setup.py setup.py
-COPY params.py params.py 
+COPY params.py params.py
+COPY tokenizer.pkl tokenizer.pkl
 
 RUN pip install .
 
