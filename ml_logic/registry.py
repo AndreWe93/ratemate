@@ -3,7 +3,7 @@ import os
 import time
 import pickle
 
-#from tensorflow import keras
+from tensorflow import keras
 
 from params import *
 import mlflow
