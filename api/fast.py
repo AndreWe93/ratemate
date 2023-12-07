@@ -8,8 +8,6 @@ from ml_logic.random_forest_model import pred_from_random_forest
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-import pandas as pd
-import numpy as np
 
 app = FastAPI()
 
@@ -60,8 +58,7 @@ def predict(
     # Overall score
     personal_score = calculate_overall_score(average_scores_df)
     sub_ratings = individual_scores(average_scores_df)
-    print(type(dist_classes[0]))
-    print(type(sub_ratings[0]))
+
     #return f"RateMate Rating: ⭐️ {personal_score} ⭐️"
     return {"personal_score": personal_score,
                 "top_1": top3_reviews[0],
