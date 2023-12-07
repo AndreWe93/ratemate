@@ -100,3 +100,11 @@ def individual_scores(df):
     average_atmosphere = round(df.atmosphere_rating.mean(),2)
 
     return average_price, average_service, average_atmosphere, average_food
+
+def class_dist(df):
+    dist_price = round(df["price"].mean().astype(np.float64),2)
+    dist_service = round(df["service"].mean().astype(np.float64),2)
+    dist_atmosphere = round(df["atmosphere"].mean().astype(np.float64),2)
+    dist_food = round(df["food"].mean().astype(np.float64),2)
+
+    return dist_price, dist_service, dist_atmosphere, dist_food
