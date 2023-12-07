@@ -9,21 +9,29 @@ import pydeck as pdk
 
 api_key = "AIzaSyBH2zXte15didv6k_rGf4dOqx4iw4scS8k"
 
-# ####### TO Dos #########
-# """
-# 1. Show the original score
-# 2. Show the subratings from the dataset
-# 3. Integrate the Word cloud picture from my notebook somehow into the streamlit app
-# 4. Add more features
-# """
-st.set_page_config(layout="wide")
-st.sidebar.markdown("""<style> .sidebar .sidebar-content { width: 400px; } </style>""", unsafe_allow_html=True)
 
-st.sidebar.title("About")
-st.sidebar.info(
-    """
-    This app is helping you to predict personal rating.
-    """)
+
+
+page_element="""
+<style>
+[data-testid="stAppViewContainer"]{
+  background-image: url("https://img.freepik.com/free-photo/top-view-christmas-decoration-with-copy-space_23-2148317986.jpg?w=2000&t=st=1701978701~exp=1701979301~hmac=59d6b096a2aef96adbd3dd69e793a4b768db782d37e297f3780a406b99baf196");
+  background-size: cover;
+}
+</style>
+"""
+
+st.markdown(page_element, unsafe_allow_html=True)
+
+
+# st.set_page_config(layout="wide")
+# st.markdown("""<style>  -content { width: 400px; } </style>""", unsafe_allow_html=True)
+
+# st.title("About")
+# st.info(
+#     """
+#     This app is helping you to predict personal rating.
+#     """)
 
 
 # gmaps.configure(api_key=api_key)
@@ -32,7 +40,7 @@ st.sidebar.info(
 
 # fig = gmaps.figure(center=new_york_coordinates, zoom_level=12)
 
-# st.sidebar.write(fig)
+# st.write(fig)
 
 # def show_google_maps(api_key, lat, lon):
 #     #gmaps = googlemaps.Client(key=api_key)
@@ -42,7 +50,7 @@ st.sidebar.info(
 
 #     fig = gmaps.figure(center=coordinates, zoom_level=12)
 
-#     return st.sidebar.write(fig)
+#     return st.write(fig)
 
 def show_google_maps(lat, lon):
     view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=13)
@@ -51,14 +59,18 @@ def show_google_maps(lat, lon):
         initial_view_state=view_state,
         api_keys={"mapbox": "YOUR_MAPBOX_API_KEY"}
     )
-    st.sidebar.pydeck_chart(map_)
+    st.pydeck_chart(map_)
 
 
-st.snow()
+#st.snow()
 
-st.markdown("""# RateMate
-## Get your personal rating for the restaurant of your choice
-Hello friend, please enter the name of the restaurant you are interested in:""")
+st.markdown("""<h1 style='color: #FF6347;'>RateMate</h1>""", unsafe_allow_html=True)
+
+
+st.markdown("""<h3 style='color: #6B8E23;'> Get your personal rating for the restaurant of your choice</h3>"""
+            , unsafe_allow_html=True)
+st.markdown(""" """,
+            unsafe_allow_html=True)
 
 
 
@@ -99,18 +111,20 @@ def results_for_restorant(restaurant_name, search_button):
             results.append("No restaurant found")
     return url, results, lat, lon
 
-restaurant_name = st.text_input("Enter restaurant name and press Enter", "Type here")
+restaurant_name = st.text_input("Hello friend, please enter the name of the restaurant you are interested in:", "Type here")
 search_button = st.button("Find")
 
 
 
 url, results, lat, lon = results_for_restorant(restaurant_name, search_button)
 for result in results:
-    st.markdown(f"<p style='color: #000080;'>{result}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:  #6B8E23;'>{result}</p>", unsafe_allow_html=True)
 st.markdown(
-    "<h6 style='color: grey;'>❗️ If this is not the restaurant you are looking for, please specify the search string, e.g. by entering a street.</h6>",
+    """<h6 style='color: grey;'>❗️ If this is not the restaurant you are looking for,
+    please specify the search string, e.g. by entering a street.</h6>""",
     unsafe_allow_html=True
 )
+
 
 
 # empty = st.container()
@@ -126,7 +140,7 @@ local_guides_review_weightage = st.checkbox('Review only from local guides')
 with dash1:
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        st.markdown("<h4 style='text-align: center; color: #800080;'>Specify your preferences</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: #FF6347 ;'>Specify your preferences</h4>", unsafe_allow_html=True)
 
     with col5:
         price_review_weightage = st.slider('PRICE', 0.0, 1.0, 0.25)
@@ -189,9 +203,9 @@ if search_button2:
             st.success("Prediction Complete!")
             st.header(f'⭐️ Your personal score is: {your_personal_score} ⭐️')
             st.header("Here are the reviews of the most active reviewers")
-            st.sidebar.markdown(f"<h6 style='color: grey;'>Top 1:</h6> {top_1_review}", unsafe_allow_html=True)
-            st.sidebar.markdown(f"<h6 style='color: grey;'>Top 2:</h6> {top_2_review}", unsafe_allow_html=True)
-            st.sidebar.markdown(f"<h6 style='color: grey;'>Top 3:</h6> {top_3_review}", unsafe_allow_html=True)
+            st.markdown(f"<h6 style='color: grey;'>Top 1:</h6> {top_1_review}", unsafe_allow_html=True)
+            st.markdown(f"<h6 style='color: grey;'>Top 2:</h6> {top_2_review}", unsafe_allow_html=True)
+            st.markdown(f"<h6 style='color: grey;'>Top 3:</h6> {top_3_review}", unsafe_allow_html=True)
             st.header("Here are the sub ratings")
             st.markdown(f'sub rating for price: {sub_price}')
             st.markdown(f'sub rating for service: {sub_service}')
@@ -210,7 +224,7 @@ if search_button2:
             fig = plt.figure(figsize=(20,20))
             plt.imshow(wordcloud, interpolation='bilinear')
             plt.axis('off')
-            st.sidebar.pyplot(fig)
+            st.pyplot(fig)
 
 
 
