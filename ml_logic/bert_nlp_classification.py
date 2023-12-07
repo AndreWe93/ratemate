@@ -13,11 +13,6 @@ from sklearn.metrics.pairwise import cosine_similarity
     and classify the reivew accordingly
 '''
 
-import pandas as pd
-from transformers import BertTokenizer, BertModel
-import torch
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
 def load_bert_model(model_name='bert-base-uncased'):
     tokenizer = BertTokenizer.from_pretrained(model_name)
@@ -27,7 +22,7 @@ def load_bert_model(model_name='bert-base-uncased'):
 def define_topic_related_words():
     topic_related_words = {
         'price': ['price'],
-        'service': ['service', 'staff', 'customer', 'experience'],
+        'service': ['service', 'staff'],
         'atmosphere': ['atmosphere', 'ambiance', 'decor', 'vibe', 'place', 'room', 'cosy', 'design', 'comfortable'],
         'food': ['food', 'dish', 'menu', 'flavor', 'quality', 'warm', 'cold', 'portion']
     }
