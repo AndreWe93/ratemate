@@ -1,3 +1,4 @@
+import wordcloud
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import requests
@@ -28,8 +29,6 @@ food_review_weightage = st.slider('Select your food rating weight', 0.0, 1.0, 0.
 service_review_weightage = st.slider('Select your service rating weight', 0.0, 1.0, 0.25)
 ambience_review_weightage = st.slider('Select your ambience rating weight', 0.0, 1.0, 0.25)
 
-# checkbox for local guides
-local_guides_review_weightage = st.checkbox('Review only from local guides')
 
 if st.button("Get Score"):
 
@@ -42,7 +41,7 @@ if st.button("Get Score"):
             }
 
 
-    ratemate_api_url = 'http://127.0.0.1:8000/personal_score'
+    ratemate_api_url = 'https://ratemate-z2kqlvo2ta-ew.a.run.app/personal_score'
     response = requests.get(ratemate_api_url, params=params)
 
     # original_score = response.json()
