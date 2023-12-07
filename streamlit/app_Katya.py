@@ -24,7 +24,7 @@ Hello friend, please insert the google maps url of the restaurant you are intere
 
 
 gmaps = googlemaps.Client(key=api_key)
-
+@st.cache_data(ttl=500)
 def find_restaurant(place_name):
     places = gmaps.places(query=place_name, type='restaurant')
 
@@ -37,24 +37,31 @@ def find_restaurant(place_name):
 
 restaurant_name = st.text_input("Enter restaurant name and press Enter", "Type here")
 search_button = st.button("Find")
-results = []
 
-if search_button:
-    restaurant = find_restaurant(restaurant_name)
-    if restaurant:
-        results.append(f"Found the restaurant: {restaurant['name']}")
-        results.append(f"Address: {restaurant['formatted_address']}")
-        results.append(f"Rating: {restaurant.get('rating', 'No rating')}")
-        place_id = restaurant['place_id']
-        google_maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}"
-        url = google_maps_url
-    else:
-        results.append("No restaurant found")
+@st.cache_data(ttl=500)
+def results():
+    results = []
 
+    if search_button:
+        restaurant = find_restaurant(restaurant_name)
+        if restaurant:
+            results.append(f"Found the restaurant: {restaurant['name']}")
+            results.append(f"Address: {restaurant['formatted_address']}")
+            results.append(f"Rating: {restaurant.get('rating', 'No rating')}")
+            place_id = restaurant['place_id']
+            google_maps_url = f"https://www.google.com/maps/place/?q=place_id:{place_id}"
+            url = google_maps_url
+        else:
+            results.append("No restaurant found")
+    return url, results
+
+
+url, results = results()
 for result in results:
     st.write(result)
 
 empty = st.container()
+empty.write(url)
 
 
 # empty2 = st.container()
@@ -65,7 +72,7 @@ local_guides_review_weightage = st.checkbox('Review only from local guides')
 with dash1:
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        st.write("""##Specify your preferences""")
+        st.markdown("<h4 style='text-align: center;'>Specify your preferences</h4>", unsafe_allow_html=True)
 
     with col5:
         price_review_weightage = st.slider('PRICE', 0.0, 1.0, 0.25)
@@ -87,11 +94,11 @@ if st.button("Get Score"):
 
     st.markdown("<h2 style='text-align: center;'>PREDICTING</h2>", unsafe_allow_html=True)
     progress_bar = st.progress(0)
-    progress_text = st.empty()
-    for i in range(101):
-        time.sleep(1)
-        progress_bar.progress(i)
-        progress_text.text(f"Progress: {i}%")
+    # progress_text = st.empty()
+    # for i in range(101):
+    #     time.sleep(1)
+    #     progress_bar.progress(i)
+    #     progress_text.text(f"Progress: {i}%")
 
     params = {
         'url': url,
