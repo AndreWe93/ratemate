@@ -7,7 +7,8 @@ from ml_logic.random_forest_model import pred_from_random_forest
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-
+import numpy as np
+import pandas as pd
 
 app = FastAPI()
 
@@ -49,7 +50,12 @@ def predict(
     # Classification of reviews
     classified_df = classify_reviews_df(pre_processed_df, "reviews_without_SW")
 
-
+    #Does not work yet
+    dist_price = classified_df["price"].mean()
+    print(dist_price)
+    dist_service = classified_df["service"].mean()
+    dist_atmosphere = classified_df["atmosphere"].mean()
+    dist_food = classified_df["food"].mean()
 
     subratings_df = pred_from_random_forest(classified_df)
 
@@ -72,6 +78,10 @@ def predict(
             "sub_service": sub_ratings[1],
             "sub_atmosphere": sub_ratings[2],
             "sub_food": sub_ratings[3],
+            "dist_price": dist_price,
+            "dist_service": dist_service,
+            "dist_atmosphere": dist_atmosphere,
+            "dist_food": dist_food,
             "wordcloud_input": wordcloud_input
             }
 
