@@ -1,3 +1,6 @@
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
 import streamlit as st
 import requests
 import gmaps
@@ -42,7 +45,7 @@ st.sidebar.info(
 #     return st.sidebar.write(fig)
 
 def show_google_maps(lat, lon):
-    view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=12)
+    view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=13)
     map_ = pdk.Deck(
         map_style="mapbox://styles/mapbox/light-v9",
         initial_view_state=view_state,
@@ -102,7 +105,6 @@ search_button = st.button("Find")
 
 
 url, results, lat, lon = results_for_restorant(restaurant_name, search_button)
-show_google_maps(lat, lon)
 for result in results:
     st.markdown(f"<p style='color: #000080;'>{result}</p>", unsafe_allow_html=True)
 st.markdown(
@@ -169,11 +171,54 @@ if search_button2:
         response = requests.get(ratemate_api_url, params=params)
         #st.write(url)
         if response.status_code == 200:
-            your_personal_score = response.json()
+            your_personal_score = response.json()["personal_score"]
+            top_1_review = response.json()["top_1"]
+            top_2_review = response.json()["top_2"]
+            top_3_review = response.json()["top_3"]
+            sub_price = response.json()["sub_price"]
+            sub_service = response.json()["sub_service"]
+            sub_atmosphere = response.json()["sub_atmosphere"]
+            sub_food = response.json()["sub_food"]
+            wordcloud_input = response.json()["wordcloud_input"]
+            dist_price = response.json()["dist_price"]
+            dist_service = response.json()["dist_service"]
+            dist_atmosphere = response.json()["dist_atmosphere"]
+            dist_food = response.json()["dist_food"]
+
+            st.divider()
             st.success("Prediction Complete!")
-            st.header(f'⭐️ {your_personal_score} ⭐️')
+            st.header(f'⭐️ Your personal score is: {your_personal_score} ⭐️')
+            st.header("Here are the reviews of the most active reviewers")
+            st.sidebar.markdown(f"<h6 style='color: grey;'>Top 1:</h6> {top_1_review}", unsafe_allow_html=True)
+            st.sidebar.markdown(f"<h6 style='color: grey;'>Top 2:</h6> {top_2_review}", unsafe_allow_html=True)
+            st.sidebar.markdown(f"<h6 style='color: grey;'>Top 3:</h6> {top_3_review}", unsafe_allow_html=True)
+            st.header("Here are the sub ratings")
+            st.markdown(f'sub rating for price: {sub_price}')
+            st.markdown(f'sub rating for service: {sub_service}')
+            st.markdown(f'sub rating for atmosphere: {sub_atmosphere}')
+            st.markdown(f'sub rating for food: {sub_food}')
+            st.header("Here are the topic distributions")
+            st.markdown(f'distribution for price: {dist_price}')
+            st.markdown(f'distribution for service: {dist_service}')
+            st.markdown(f'distribution for atmosphere: {dist_atmosphere}')
+            st.markdown(f'distribution for food: {dist_food}')
+
+            wordcloud = WordCloud(max_words=10000, min_font_size=10, height=800, width=1600,
+                    background_color="white", colormap="viridis").generate(wordcloud_input)
+
+            # Display the word cloud using Matplotlib
+            fig = plt.figure(figsize=(20,20))
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis('off')
+            st.sidebar.pyplot(fig)
+
+
+
+
         else:
             st.error("Error in prediction. Please try again.")
+
+show_google_maps(lat, lon)
 
     # for result in results:
     #     st.write(result, url)
