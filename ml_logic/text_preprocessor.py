@@ -7,6 +7,10 @@ import numpy as np
 import string
 
 #!pip install nltk # Install NLTK
+import nltk
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
